@@ -4,638 +4,1320 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-Pesa Manager — GB ICT Solutions</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>M-Pesa Agent Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f0faf5;--card:#fff;--green:#00a550;--green-dark:#007a3a;--green-light:#e6f7ef;--red:#e53e3e;--red-light:#fff5f5;--amber:#d97706;--amber-light:#fffbeb;--blue:#2563eb;--blue-light:#eff6ff;--text:#1a2e22;--muted:#6b7280;--border:#d1fae5;--shadow:0 4px 24px rgba(0,165,80,0.10);--radius:16px;}
+:root{
+  --bg:#0d1f14;--surface:#112018;--card:#162b1d;--border:#1e3d28;
+  --green:#00c853;--green2:#00a550;--green3:#007a3c;
+  --red:#ef4444;--amber:#f59e0b;--blue:#0ea5e9;
+  --text:#e2f0e8;--muted:#5a8a68;--radius:12px;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
-header{background:linear-gradient(135deg,#00a550,#007a3a,#005a2a);padding:16px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,100,50,0.25);}
-.hi{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;}
-.brand{display:flex;align-items:center;gap:12px;}
-.brand-logo{width:44px;height:44px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.35);border-radius:12px;display:grid;place-items:center;font-size:20px;}
-.brand h1{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:#fff;letter-spacing:1px;}
-.brand p{font-size:0.65rem;color:rgba(255,255,255,0.75);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-.htime .hdate{font-family:'Orbitron',sans-serif;font-size:0.8rem;color:#fff;text-align:right;}
-.htime .htimeval{font-size:0.68rem;color:rgba(255,255,255,0.7);text-align:right;margin-top:2px;}
-.sync-indicator{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:20px;font-size:0.7rem;color:#fff;font-weight:700;margin-top:4px;}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-.sync-dot.offline{background:#f87171;animation:none;}
-nav{background:#fff;border-bottom:2px solid var(--border);padding:8px 20px;display:flex;gap:5px;overflow-x:auto;}
-nav button{background:none;border:none;color:var(--muted);padding:7px 16px;border-radius:30px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.86rem;font-weight:700;white-space:nowrap;transition:all 0.2s;}
-nav button:hover{background:var(--green-light);color:var(--green);}
-nav button.active{background:var(--green);color:#fff;}
-main{max-width:1100px;margin:0 auto;padding:20px 18px;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#062010,#0a2e18,#0d3d1f);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--green2);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:42px;height:42px;background:var(--green2);border-radius:10px;display:grid;place-items:center;font-size:1.4rem;}
+.logo h1{font-family:'Rajdhani',sans-serif;font-size:1.3rem;letter-spacing:1px;color:#fff;}
+.logo p{font-size:.68rem;color:var(--green);letter-spacing:2px;text-transform:uppercase;}
+.sync-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,200,100,.12);border:1px solid var(--green2);padding:3px 10px;border-radius:20px;font-size:.68rem;color:var(--green);font-weight:700;margin-top:4px;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.sync-dot.off{background:var(--red);animation:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.htime{text-align:right;}
+.hdate{font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--green);}
+.htimeval{font-size:.7rem;color:var(--muted);}
+
+/* FLOAT STATUS BAR */
+.float-bar{background:#0a2515;padding:8px 20px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);}
+.float-bar::-webkit-scrollbar{display:none;}
+.fchip{flex-shrink:0;background:rgba(0,200,100,.08);border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:8px;}
+.fchip-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.fchip-val{font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--text);font-weight:700;}
+.fchip.warn .fchip-val{color:var(--amber);}
+.fchip.danger .fchip-val{color:var(--red);}
+.fchip.good .fchip-val{color:var(--green);}
+
+/* NAV */
+nav{display:flex;gap:4px;background:var(--surface);padding:8px 20px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+nav button{background:none;border:none;color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;white-space:nowrap;transition:all .2s;}
+nav button:hover{color:var(--text);background:var(--card);}
+nav button.active{background:var(--green2);color:#fff;}
+
+main{padding:20px;max-width:1100px;margin:0 auto;}
 .tab{display:none;}.tab.active{display:block;}
-.stitle{font-family:'Orbitron',sans-serif;font-size:0.86rem;color:var(--green-dark);letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
-.stitle::after{content:'';flex:1;height:2px;background:var(--border);}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:24px;}
-.stat{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden;}
-.stat::after{content:'';position:absolute;bottom:-16px;right:-16px;width:65px;height:65px;border-radius:50%;background:var(--green-light);opacity:0.5;}
-.stat.sg{border-top:3px solid var(--green);}
-.stat.sr{border-top:3px solid var(--red);}
-.stat.sa{border-top:3px solid var(--amber);}
-.stat.sb{border-top:3px solid var(--blue);}
-.stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;}
-.stat-val{font-family:'Orbitron',sans-serif;font-size:1.35rem;font-weight:700;color:var(--text);}
-.stat-val.pos{color:var(--green);}
-.stat-val.neg{color:var(--red);}
-.stat-sub{font-size:0.7rem;color:var(--muted);margin-top:3px;}
-.setup-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px;}
-.fg{display:flex;flex-direction:column;gap:5px;}
-label{font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
-input,select{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:600;outline:none;transition:border 0.2s;width:100%;}
-input:focus,select:focus{border-color:var(--green);background:#fff;}
-.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.form-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
-.form-4col{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
-@media(max-width:700px){.form-2col,.form-3col,.form-4col{grid-template-columns:1fr 1fr;}}
-@media(max-width:480px){.form-2col,.form-3col,.form-4col{grid-template-columns:1fr;}}
-.deposit-form{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid var(--green);position:relative;overflow:hidden;margin-bottom:20px;}
-.deposit-form::before{content:'📥 DEPOSIT';position:absolute;top:0;right:0;background:var(--green);color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:1.5px;padding:4px 12px;border-radius:0 var(--radius) 0 10px;}
-.withdraw-form{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid var(--red);position:relative;overflow:hidden;margin-bottom:20px;}
-.withdraw-form::before{content:'📤 WITHDRAWAL';position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:1.5px;padding:4px 12px;border-radius:0 var(--radius) 0 10px;}
-.other-form{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid var(--blue);margin-bottom:20px;}
-.form-title{font-family:'Orbitron',sans-serif;font-size:0.82rem;margin-bottom:13px;padding-top:4px;}
-.deposit-form .form-title{color:var(--green-dark);}
-.withdraw-form .form-title{color:var(--red);}
-.other-form .form-title{color:var(--blue);}
-.withdraw-form input:focus{border-color:var(--red);}
-.divider-label{background:var(--green-light);border:1px solid var(--border);border-radius:7px;padding:6px 11px;font-size:0.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green-dark);margin:8px 0;}
-.divider-label.red{background:var(--red-light);border-color:#fca5a5;color:var(--red);}
-.btn{padding:10px 22px;border-radius:10px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:700;transition:all 0.2s;}
-.btn-green{background:var(--green);color:#fff;}
-.btn-green:hover{background:var(--green-dark);}
+
+/* SECTION TITLE */
+.stitle{font-family:'Rajdhani',sans-serif;font-size:1.15rem;color:var(--green);margin-bottom:14px;letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+.stitle::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--green2);}
+.stat.red::before{background:var(--red);}
+.stat.amber::before{background:var(--amber);}
+.stat.blue::before{background:var(--blue);}
+.stat.purple::before{background:#a855f7;}
+.stat-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:5px;}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--text);}
+.stat-val.g{color:var(--green);}
+.stat-val.r{color:var(--red);}
+.stat-val.a{color:var(--amber);}
+.stat-val.b{color:var(--blue);}
+.stat-sub{font-size:.68rem;color:var(--muted);margin-top:3px;}
+
+/* BIG TXN BUTTONS */
+.txn-big-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.txn-big-btn{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px 14px;cursor:pointer;text-align:center;transition:all .2s;}
+.txn-big-btn:hover,.txn-big-btn.active{border-color:var(--green2);background:rgba(0,165,80,.1);transform:translateY(-2px);}
+.txn-big-btn.active-red{border-color:var(--red);background:rgba(239,68,68,.08);}
+.txn-big-icon{font-size:2rem;margin-bottom:6px;}
+.txn-big-label{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);}
+.txn-big-desc{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.txn-big-earn{font-size:.7rem;color:var(--green);margin-top:5px;font-weight:600;}
+
+/* SECONDARY TXN BUTTONS */
+.txn-sm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
+.txn-sm-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:10px 8px;cursor:pointer;text-align:center;transition:all .2s;}
+.txn-sm-btn:hover,.txn-sm-btn.active{border-color:var(--green2);background:rgba(0,165,80,.08);}
+.txn-sm-icon{font-size:1.3rem;}
+.txn-sm-label{font-size:.73rem;font-weight:600;color:var(--text);margin-top:3px;}
+
+/* FORM */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.form-card-title{font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--green);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.fg{flex:1;min-width:140px;display:flex;flex-direction:column;gap:5px;}
+label{font-size:.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+input,select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border .2s;}
+input:focus,select:focus{border-color:var(--green2);}
+select option{background:var(--surface);}
+
+/* BUTTONS */
+.btn{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-green{background:var(--green2);color:#fff;}
+.btn-green:hover{background:var(--green3);}
 .btn-red{background:var(--red);color:#fff;}
-.btn-red:hover{background:#c53030;}
-.btn-outline{background:none;border:2px solid var(--green);color:var(--green);}
-.btn-outline:hover{background:var(--green-light);}
-.btn-amber{background:var(--amber);color:#fff;}
-.btn-sm{padding:5px 11px;font-size:0.78rem;}
-.btn-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:13px;}
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border);box-shadow:var(--shadow);background:#fff;margin-bottom:20px;}
+.btn-red:hover{background:#c62828;}
+.btn-amber{background:var(--amber);color:#000;}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--green2);color:var(--green);}
+.btn-sm{padding:5px 12px;font-size:.83rem;}
+.btn-xs{padding:3px 8px;font-size:.75rem;}
+.btn-block{width:100%;justify-content:center;}
+.btn-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+
+/* COMMISSION PREVIEW */
+.comm-box{background:rgba(0,165,80,.1);border:1.5px solid var(--green2);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:12px;}
+.comm-box-label{font-size:.8rem;color:var(--green);font-weight:600;}
+.comm-box-band{font-size:.7rem;color:var(--muted);margin-top:2px;}
+.comm-box-val{font-family:'Rajdhani',sans-serif;font-size:1.7rem;color:var(--green);font-weight:700;}
+.comm-box-note{font-size:.68rem;color:var(--muted);text-align:right;}
+
+/* IMPACT CHIPS */
+.impact-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.ichip{flex:1;min-width:110px;border-radius:8px;padding:8px 10px;border:1px solid;}
+.ichip.cash-up{background:rgba(0,200,100,.08);border-color:var(--green2);color:var(--green);}
+.ichip.cash-dn{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red);}
+.ichip.float-up{background:rgba(14,165,233,.08);border-color:var(--blue);color:var(--blue);}
+.ichip.float-dn{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red);}
+.ichip.neutral{background:rgba(245,158,11,.08);border-color:var(--amber);color:var(--amber);}
+.ichip-icon{font-size:1.1rem;margin-bottom:2px;}
+.ichip-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.ichip-val{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:16px;}
 table{width:100%;border-collapse:collapse;}
-thead{background:linear-gradient(90deg,var(--green),var(--green-dark));}
-th{padding:11px 13px;text-align:left;font-size:0.72rem;letter-spacing:1px;color:#fff;text-transform:uppercase;font-weight:700;white-space:nowrap;}
-td{padding:10px 13px;border-top:1px solid var(--border);font-size:0.84rem;font-weight:600;vertical-align:top;}
-tr:hover td{background:var(--green-light);}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.71rem;font-weight:700;}
-.bdep{background:var(--green-light);color:var(--green);}
-.bwit{background:var(--red-light);color:var(--red);}
-.bother{background:var(--blue-light);color:var(--blue);}
-.pcell{line-height:1.5;}
-.pcell .pname{font-weight:700;font-size:0.84rem;}
-.pcell .pphone{font-size:0.74rem;color:var(--muted);}
-.close-panel{background:#fffbeb;border:2px solid var(--amber);border-radius:var(--radius);padding:18px;margin-bottom:18px;}
-.close-panel h3{font-family:'Orbitron',sans-serif;font-size:0.8rem;color:var(--amber);margin-bottom:12px;}
-.summary-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
-@media(max-width:600px){.summary-row{grid-template-columns:1fr;}}
-.summary-box{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);}
-.summary-box h3{font-family:'Orbitron',sans-serif;font-size:0.76rem;color:var(--green-dark);margin-bottom:12px;}
-.sum-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:0.84rem;}
-.sum-row:last-child{border:none;font-weight:800;}
-.sum-row span:last-child{font-family:'Orbitron',sans-serif;font-size:0.86rem;}
-.profit{color:var(--green);}
-.loss{color:var(--red);}
-.history-day{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:12px;}
-.history-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
-.history-day-header h3{font-family:'Orbitron',sans-serif;font-size:0.8rem;color:var(--green-dark);}
-.day-stats{display:flex;gap:12px;flex-wrap:wrap;}
-.day-stat{font-size:0.78rem;color:var(--muted);}
-.day-stat strong{color:var(--text);}
-.alert{border-radius:10px;padding:10px 14px;font-size:0.84rem;font-weight:600;margin-bottom:13px;}
-.alert-green{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green);}
-.alert-amber{background:var(--amber-light);color:var(--amber);border:1px solid var(--amber);}
-.day-status{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:0.76rem;font-weight:700;margin-bottom:14px;}
-.day-open{background:var(--green-light);color:var(--green);}
-.day-closed{background:var(--red-light);color:var(--red);}
-.dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
-.charge-info{background:var(--amber-light);border:1px solid var(--amber);border-radius:7px;padding:6px 10px;font-size:0.76rem;color:var(--amber);font-weight:700;margin-top:5px;}
-.empty{text-align:center;padding:32px;color:var(--muted);}
-.empty-icon{font-size:2.5rem;opacity:0.35;margin-bottom:9px;}
-#toast{position:fixed;bottom:20px;right:16px;background:var(--green);color:#fff;padding:11px 20px;border-radius:11px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;opacity:0;transform:translateY(14px);transition:all 0.3s;pointer-events:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
-#toast.show{opacity:1;transform:translateY(0);}
-.loading{display:flex;align-items:center;justify-content:center;padding:30px;gap:10px;color:var(--muted);}
-.spinner{width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;}
+thead{background:#0a1f12;}
+th{padding:10px 13px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.75rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:600;}
+.badge-green{background:rgba(0,200,100,.15);color:var(--green);}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red);}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber);}
+.badge-blue{background:rgba(14,165,233,.15);color:var(--blue);}
+
+/* FLOAT METER */
+.float-meter{background:var(--border);border-radius:6px;height:8px;overflow:hidden;margin:8px 0;}
+.float-fill{height:100%;border-radius:6px;transition:width .5s;}
+.float-fill.good{background:linear-gradient(90deg,var(--green3),var(--green));}
+.float-fill.warn{background:linear-gradient(90deg,#d97706,var(--amber));}
+.float-fill.low{background:linear-gradient(90deg,#b91c1c,var(--red));}
+
+/* DAY BOOK */
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;height:100%;}
+.day-card.open-card{border-top:3px solid var(--green);}
+.day-card.close-card{border-top:3px solid var(--red);}
+.bal-row{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:8px;margin-bottom:8px;}
+.bal-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.bal-val{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;}
+
+/* COMMISSION TABLE */
+.comm-rate-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.comm-rate-table th{background:rgba(0,165,80,.12);color:var(--green);padding:7px 10px;text-align:left;font-size:.7rem;letter-spacing:.5px;}
+.comm-rate-table td{padding:7px 10px;border-bottom:1px solid var(--border);}
+.comm-rate-table tr:hover td{background:rgba(255,255,255,.02);}
+
+/* REPORT BARS */
+.rep-bar{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.rep-bar-label{min-width:160px;font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rep-bar-track{flex:1;background:var(--border);border-radius:4px;height:10px;overflow:hidden;}
+.rep-bar-fill{height:100%;background:linear-gradient(90deg,var(--green3),var(--green));border-radius:4px;transition:width .6s;}
+.rep-bar-val{min-width:100px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:.9rem;color:var(--green);}
+
+/* FILTER */
+.filter-row{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;}
+.filter-row input,.filter-row select{flex:1;min-width:130px;max-width:200px;}
+
+/* WARN BANNER */
+.warn-banner{border-radius:10px;padding:10px 14px;font-size:.83rem;font-weight:500;margin-bottom:10px;}
+.warn-danger{background:rgba(239,68,68,.1);border:1.5px solid var(--red);color:var(--red);}
+.warn-warn{background:rgba(245,158,11,.1);border:1.5px solid var(--amber);color:var(--amber);}
+.warn-info{background:rgba(14,165,233,.1);border:1.5px solid var(--blue);color:var(--blue);}
+
+/* INLINE WARN */
+.inline-warn{display:none;background:rgba(239,68,68,.1);border:1.5px solid var(--red);border-radius:8px;padding:8px 12px;font-size:.82rem;color:var(--red);font-weight:500;margin-top:8px;}
+
+/* MODAL */
+.modal-bd{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px;}
+.modal-bd.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:mIn .2s ease;max-height:88vh;overflow-y:auto;}
+@keyframes mIn{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.15rem;color:var(--green);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:28px;gap:10px;color:var(--muted);}
+.spinner{width:18px;height:18px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:30px;color:var(--muted);}
+.empty-icon{font-size:2.5rem;opacity:.3;margin-bottom:8px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:16px;background:var(--green2);color:#fff;padding:11px 20px;border-radius:11px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;opacity:0;transform:translateY(14px);transition:all .3s;pointer-events:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.t-amber{background:var(--amber);color:#000;}
+#toast.t-red{background:var(--red);}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:580px){.g2{grid-template-columns:1fr;}main{padding:12px;}nav{padding:6px 12px;}.txn-big-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 
 <header>
-<div class="hi">
-  <div class="brand">
-    <div class="brand-logo">📱</div>
+  <div class="logo">
+    <div class="logo-icon">📱</div>
     <div>
-      <h1>M-PESA MANAGER</h1>
-      <p>GB ICT Solutions — Real-Time</p>
-      <div class="sync-indicator"><div class="sync-dot" id="syncDot"></div><span id="syncStatus">Connecting...</span></div>
+      <h1 id="agentTitle">M-PESA AGENT</h1>
+      <p id="agentSub">Float & Commission Manager</p>
+      <div class="sync-badge"><div class="sync-dot" id="syncDot"></div><span id="syncStatus">Connecting...</span></div>
     </div>
   </div>
   <div class="htime">
     <div class="hdate" id="hDate"></div>
     <div class="htimeval" id="hTime"></div>
   </div>
-</div>
 </header>
 
+<!-- FLOAT STATUS BAR -->
+<div class="float-bar">
+  <div class="fchip good" id="fchipFloat">
+    <div>
+      <div class="fchip-label">📱 E-Float</div>
+      <div class="fchip-val" id="fcFloat">KSh 0.00</div>
+    </div>
+  </div>
+  <div class="fchip">
+    <div>
+      <div class="fchip-label">💵 Cash in Hand</div>
+      <div class="fchip-val" id="fcCash">KSh 0.00</div>
+    </div>
+  </div>
+  <div class="fchip good">
+    <div>
+      <div class="fchip-label">💰 Today Commission</div>
+      <div class="fchip-val" id="fcComm">KSh 0.00</div>
+    </div>
+  </div>
+  <div class="fchip">
+    <div>
+      <div class="fchip-label">📊 Today Txns</div>
+      <div class="fchip-val" id="fcTxns">0</div>
+    </div>
+  </div>
+  <div class="fchip">
+    <div>
+      <div class="fchip-label">💼 Total Assets</div>
+      <div class="fchip-val" id="fcTotal">KSh 0.00</div>
+    </div>
+  </div>
+</div>
+
 <nav>
-  <button class="active" onclick="switchTab('today',this)">📊 Dashboard</button>
-  <button onclick="switchTab('deposit',this)">📥 Deposits</button>
-  <button onclick="switchTab('withdraw',this)">📤 Withdrawals</button>
-  <button onclick="switchTab('other',this)">🔄 Other</button>
-  <button onclick="switchTab('summary',this)">📋 Summary</button>
-  <button onclick="switchTab('history',this)">📅 History</button>
+  <button class="active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+  <button onclick="switchTab('transact',this)">💳 New Transaction</button>
+  <button onclick="switchTab('records',this)">📋 Records</button>
+  <button onclick="switchTab('daybook',this)">📒 Day Book</button>
+  <button onclick="switchTab('float',this)">🔄 Float</button>
+  <button onclick="switchTab('commission',this)">💰 Commission</button>
+  <button onclick="switchTab('reports',this)">📈 Reports</button>
+  <button onclick="switchTab('settings',this)">⚙ Settings</button>
 </nav>
 
 <main>
 
-<!-- DASHBOARD -->
-<div class="tab active" id="tab-today">
-  <div id="no-day-panel">
-    <div class="alert alert-amber">⚠️ No active session. Open today's business day to start.</div>
-    <div class="setup-card">
-      <div class="stitle">🌅 Open Business Day</div>
-      <div class="form-3col">
-        <div class="fg"><label>Date</label><input type="date" id="open-date"></div>
-        <div class="fg"><label>Opening Float — Cash in Till (KSh)</label><input type="number" id="open-float" placeholder="e.g. 5000" min="0"></div>
-        <div class="fg"><label>Opening M-Pesa E-Float (KSh)</label><input type="number" id="open-mpesa" placeholder="e.g. 10000" min="0"></div>
-      </div>
-      <button class="btn btn-green" onclick="openDay()">🌅 Open Day</button>
-    </div>
-  </div>
-  <div id="day-panel" style="display:none">
-    <div id="day-status-badge"></div>
-    <div class="stats-grid" id="live-stats"></div>
-    <div id="close-day-section" style="display:none">
-      <div class="close-panel">
-        <h3>🌇 CLOSE BUSINESS DAY</h3>
-        <div class="form-2col">
-          <div class="fg"><label>Closing Float — Actual Cash (KSh)</label><input type="number" id="close-float" placeholder="Count cash..." min="0"></div>
-          <div class="fg"><label>Closing M-Pesa E-Float (KSh)</label><input type="number" id="close-mpesa" placeholder="Check M-Pesa..." min="0"></div>
+<!-- ═══════ DASHBOARD ═══════ -->
+<div class="tab active" id="tab-dashboard">
+  <div id="dashWarnings"></div>
+  <div class="stats-row" id="dashStats"></div>
+  <div class="g2">
+    <div>
+      <div class="stitle">Float Status</div>
+      <div class="form-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div class="stat-label">E-FLOAT AVAILABLE</div>
+            <div class="bal-val" id="dashFloat" style="color:var(--green);font-size:1.8rem;font-family:'Rajdhani',sans-serif">KSh 0</div>
+          </div>
+          <div style="text-align:right">
+            <div class="stat-label">CASH IN HAND</div>
+            <div class="bal-val" id="dashCash" style="color:var(--amber);font-size:1.8rem;font-family:'Rajdhani',sans-serif">KSh 0</div>
+          </div>
         </div>
-        <div class="btn-row">
-          <button class="btn btn-amber" onclick="closeDay()">🌇 Close &amp; Save Day</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('close-day-section').style.display='none'">Cancel</button>
+        <div class="float-meter"><div class="float-fill good" id="floatMeter" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-bottom:12px">
+          <span>Low</span><span id="floatPct">0% of target</span><span>Full</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:20px;flex-wrap:wrap">
+          <div><div style="font-size:.68rem;color:var(--muted)">Float sent today (deps)</div><div style="font-family:'Rajdhani',sans-serif;color:var(--red)" id="dashFloatOut">KSh 0</div></div>
+          <div><div style="font-size:.68rem;color:var(--muted)">Float received (wdws)</div><div style="font-family:'Rajdhani',sans-serif;color:var(--green)" id="dashFloatIn">KSh 0</div></div>
         </div>
       </div>
     </div>
-    <div id="open-actions" class="btn-row" style="margin-bottom:18px">
-      <button class="btn btn-green" onclick="switchTab('deposit',document.querySelectorAll('nav button')[1])">📥 Record Deposit</button>
-      <button class="btn btn-red" onclick="switchTab('withdraw',document.querySelectorAll('nav button')[2])">📤 Record Withdrawal</button>
-      <button class="btn btn-amber btn-sm" style="margin-left:auto" onclick="document.getElementById('close-day-section').style.display='block'">🌇 Close Day</button>
-    </div>
-    <div class="stitle">Today's All Transactions</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Time</th><th>Type</th><th>Customer Name</th><th>Phone</th><th>ID No.</th><th>Amount (KSh)</th><th>Charge (KSh)</th><th>Receiver</th><th>Note</th><th></th></tr></thead>
-        <tbody id="today-tbody"><tr><td colspan="10"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody>
-      </table>
+    <div>
+      <div class="stitle">Recent Transactions</div>
+      <div class="form-card" style="padding:0;overflow:hidden">
+        <div id="dashRecent"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- DEPOSITS -->
-<div class="tab" id="tab-deposit">
-  <div id="dep-no-day" class="alert alert-amber" style="display:none">⚠️ Please open a business day first.</div>
-  <div id="dep-wrap">
-    <div class="deposit-form">
-      <div class="form-title">📥 Record Customer Deposit (Send Money)</div>
-      <div class="divider-label">👤 Customer Details (Who is Sending)</div>
-      <div class="form-3col">
-        <div class="fg"><label>Customer Full Name</label><input type="text" id="dep-cust-name" placeholder="e.g. John Kamau"></div>
-        <div class="fg"><label>Customer Phone No.</label><input type="tel" id="dep-cust-phone" placeholder="e.g. 0712 345 678"></div>
-        <div class="fg"><label>ID / Passport No.</label><input type="text" id="dep-cust-id" placeholder="e.g. 12345678"></div>
+<!-- ═══════ NEW TRANSACTION ═══════ -->
+<div class="tab" id="tab-transact">
+  <!-- Live balance bar -->
+  <div id="txnBalBar" style="display:flex;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.83rem;color:var(--muted)">
+    <span>📱 Float: <strong id="txnFloat" style="color:var(--green)">KSh 0</strong></span>
+    <span>💵 Cash: <strong id="txnCash" style="color:var(--amber)">KSh 0</strong></span>
+    <span>💰 Today Comm: <strong id="txnComm" style="color:var(--green)">KSh 0</strong></span>
+  </div>
+
+  <!-- Primary: Deposit & Withdrawal -->
+  <div class="txn-big-grid">
+    <div class="txn-big-btn active" data-type="deposit" onclick="selectType('deposit')">
+      <div class="txn-big-icon">📥</div>
+      <div class="txn-big-label">DEPOSIT</div>
+      <div class="txn-big-desc">Cash in → Float out</div>
+      <div class="txn-big-earn">Earn commission ✓</div>
+    </div>
+    <div class="txn-big-btn" data-type="withdrawal" onclick="selectType('withdrawal')">
+      <div class="txn-big-icon">📤</div>
+      <div class="txn-big-label">WITHDRAWAL</div>
+      <div class="txn-big-desc">Float in → Cash out</div>
+      <div class="txn-big-earn">Earn commission ✓</div>
+    </div>
+  </div>
+
+  <div style="font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">Other Services</div>
+  <div class="txn-sm-grid">
+    <div class="txn-sm-btn" data-type="send" onclick="selectType('send')"><div class="txn-sm-icon">➡️</div><div class="txn-sm-label">Send Money</div></div>
+    <div class="txn-sm-btn" data-type="airtime" onclick="selectType('airtime')"><div class="txn-sm-icon">📱</div><div class="txn-sm-label">Airtime/Data</div></div>
+    <div class="txn-sm-btn" data-type="paybill" onclick="selectType('paybill')"><div class="txn-sm-icon">🏦</div><div class="txn-sm-label">Paybill/Till</div></div>
+    <div class="txn-sm-btn" data-type="topup" onclick="selectType('topup')"><div class="txn-sm-icon">🔄</div><div class="txn-sm-label">Float Top-up</div></div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-card-title" id="txnFormTitle">📥 Deposit — Cash in, Float out</div>
+    <div class="form-row">
+      <div class="fg"><label>Amount (KSh)</label><input type="number" id="txnAmount" min="1" placeholder="Enter amount" oninput="updatePreview()"></div>
+      <div class="fg"><label>Customer Phone</label><input type="tel" id="txnPhone" placeholder="07XX XXX XXX"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Customer Name</label><input type="text" id="txnCustomer" placeholder="Optional"></div>
+      <div class="fg"><label>M-Pesa Reference</label><input type="text" id="txnRef" placeholder="e.g. QAB1234XYZ"></div>
+    </div>
+
+    <!-- Commission preview -->
+    <div class="comm-box">
+      <div>
+        <div class="comm-box-label">💰 Your Commission</div>
+        <div class="comm-box-band" id="commBand">Enter amount to calculate</div>
       </div>
-      <div class="divider-label">📥 Receiver Details</div>
-      <div class="form-3col">
-        <div class="fg"><label>Receiver Full Name</label><input type="text" id="dep-recv-name" placeholder="e.g. Jane Wanjiru"></div>
-        <div class="fg"><label>Receiver Phone No.</label><input type="tel" id="dep-recv-phone" placeholder="e.g. 0722 987 654"></div>
-        <div class="fg"><label>Receiver ID (optional)</label><input type="text" id="dep-recv-id" placeholder="e.g. 87654321"></div>
-      </div>
-      <div class="divider-label">💰 Transaction Details</div>
-      <div class="form-3col">
-        <div class="fg"><label>Amount Deposited (KSh)</label><input type="number" id="dep-amount" placeholder="e.g. 2000" min="0"></div>
-        <div class="fg"><label>M-Pesa Charge (KSh)</label><input type="number" id="dep-charge" value="0" min="0"></div>
-        <div class="fg"><label>Note / Reference</label><input type="text" id="dep-note" placeholder="Optional"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-green" onclick="recordDeposit()">✅ Record Deposit</button>
-        <button class="btn btn-outline" onclick="clearDepForm()">Clear</button>
+      <div style="text-align:right">
+        <div class="comm-box-val" id="commVal">KSh 0</div>
+        <div class="comm-box-note" id="commNote"></div>
       </div>
     </div>
-    <div class="stitle">Today's Deposits</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Time</th><th>Customer (Sender)</th><th>Phone</th><th>ID No.</th><th>Receiver</th><th>Recv. Phone</th><th>Amount (KSh)</th><th>Charge</th><th>Note</th><th></th></tr></thead>
-        <tbody id="dep-tbody"><tr><td colspan="10"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody>
-      </table>
+
+    <!-- Impact preview -->
+    <div class="impact-row" id="impactRow"></div>
+
+    <!-- Float warning -->
+    <div class="inline-warn" id="inlineWarn"></div>
+
+    <div style="margin-top:14px" class="btn-row">
+      <button class="btn btn-green" style="flex:1;justify-content:center;font-size:1.05rem;padding:12px;" onclick="submitTxn()">✔ Record Transaction</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetForm()">↺ Reset</button>
     </div>
   </div>
 </div>
 
-<!-- WITHDRAWALS -->
-<div class="tab" id="tab-withdraw">
-  <div id="wit-no-day" class="alert alert-amber" style="display:none">⚠️ Please open a business day first.</div>
-  <div id="wit-wrap">
-    <div class="withdraw-form">
-      <div class="form-title">📤 Record Customer Withdrawal</div>
-      <div class="divider-label red">👤 Customer Details</div>
-      <div class="form-3col">
-        <div class="fg"><label>Customer Full Name</label><input type="text" id="wit-cust-name" placeholder="e.g. Mary Otieno"></div>
-        <div class="fg"><label>Customer Phone No.</label><input type="tel" id="wit-cust-phone" placeholder="e.g. 0733 111 222"></div>
-        <div class="fg"><label>ID / Passport No.</label><input type="text" id="wit-cust-id" placeholder="e.g. 23456789"></div>
+<!-- ═══════ RECORDS ═══════ -->
+<div class="tab" id="tab-records">
+  <div class="filter-row">
+    <input type="date" id="recFilterDate">
+    <select id="recFilterType">
+      <option value="">All Types</option>
+      <option value="deposit">Deposits</option>
+      <option value="withdrawal">Withdrawals</option>
+      <option value="send">Send Money</option>
+      <option value="airtime">Airtime</option>
+      <option value="paybill">Paybill</option>
+      <option value="topup">Float Top-up</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="loadRecords()">🔍 Filter</button>
+    <button class="btn btn-secondary btn-sm" onclick="clearRecFilter()">✕ Clear</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Customer</th><th>Phone</th><th>Amount</th><th>Commission</th><th>Reference</th><th>Float Effect</th><th></th></tr></thead>
+      <tbody id="recTable"><tr><td colspan="10"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ DAY BOOK ═══════ -->
+<div class="tab" id="tab-daybook">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div class="stitle" style="margin:0">Day Book</div>
+    <div id="dayBtns" class="btn-row"></div>
+  </div>
+  <div id="dayBanner" style="margin-bottom:14px"></div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="day-card open-card">
+      <div class="form-card-title">🌅 Opening Balance</div>
+      <div id="openDisplay"><div class="empty"><div class="empty-icon">🌅</div>No day opened</div></div>
+    </div>
+    <div class="day-card close-card">
+      <div class="form-card-title">🌇 Closing Balance</div>
+      <div id="closeDisplay"><div class="empty"><div class="empty-icon">🌇</div>Day not closed</div></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="form-card-title">📊 Today's Summary</div>
+    <div id="daySummary"><div class="empty"><div class="empty-icon">📊</div>Open the day to start tracking</div></div>
+  </div>
+  <div class="stitle" style="margin-top:4px">Past Days History</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Open Float</th><th>Open Cash</th><th>Close Float</th><th>Close Cash</th><th>Deposits</th><th>Withdrawals</th><th>Commission</th><th>Net Change</th></tr></thead>
+      <tbody id="dayHistTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ FLOAT ═══════ -->
+<div class="tab" id="tab-float">
+  <div class="stitle">Float Management</div>
+  <div class="g2">
+    <div>
+      <div class="form-card">
+        <div class="form-card-title">📱 Current Float Status</div>
+        <div style="text-align:center;padding:8px 0 14px">
+          <div class="stat-label">E-FLOAT BALANCE</div>
+          <div class="bal-val" id="floatPageBal" style="color:var(--green);font-size:2rem;font-family:'Rajdhani',sans-serif">KSh 0</div>
+          <div class="float-meter" style="margin:10px 0"><div class="float-fill good" id="floatMeter2" style="width:0%"></div></div>
+          <div style="font-size:.72rem;color:var(--muted)" id="floatPct2">Set target in Settings</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;justify-content:space-between">
+          <div><div class="stat-label">CASH IN HAND</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;color:var(--amber)" id="cashPageBal">KSh 0</div></div>
+          <div style="text-align:right"><div class="stat-label">TOTAL ASSETS</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.3rem" id="totalPageBal">KSh 0</div></div>
+        </div>
       </div>
-      <div class="divider-label red">💵 Withdrawal Details</div>
-      <div class="form-3col">
-        <div class="fg"><label>Amount Withdrawn (KSh)</label><input type="number" id="wit-amount" placeholder="e.g. 5000" min="0" oninput="autoCharge()"></div>
-        <div class="fg"><label>M-Pesa Charge (KSh) <span style="color:var(--green);font-size:0.65rem">auto-calc</span></label><input type="number" id="wit-charge" placeholder="0" min="0"><div class="charge-info" id="wit-charge-info" style="display:none"></div></div>
-        <div class="fg"><label>Note / Reference</label><input type="text" id="wit-note" placeholder="Optional"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-red" onclick="recordWithdrawal()">✅ Record Withdrawal</button>
-        <button class="btn btn-outline" onclick="clearWitForm()">Clear</button>
+      <div class="form-card">
+        <div class="form-card-title">🔄 Float Top-Up</div>
+        <div class="fg" style="margin-bottom:10px"><label>Amount Added (KSh)</label><input type="number" id="topupAmt" placeholder="Enter top-up amount" min="1"></div>
+        <div class="fg" style="margin-bottom:10px"><label>Method</label>
+          <select id="topupMethod">
+            <option>Bank to M-Pesa</option><option>Agent Super</option><option>Cash deposit at bank</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Reference</label><input type="text" id="topupRef" placeholder="Transaction reference"></div>
+        <button class="btn btn-green btn-block" onclick="doTopUp()">+ Add Float</button>
       </div>
     </div>
-    <div class="stitle">Today's Withdrawals</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Time</th><th>Customer Name</th><th>Phone</th><th>ID No.</th><th>Amount Withdrawn (KSh)</th><th>Charge Earned (KSh)</th><th>Note</th><th></th></tr></thead>
-        <tbody id="wit-tbody"><tr><td colspan="8"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody>
-      </table>
+    <div>
+      <div class="form-card">
+        <div class="form-card-title">🔧 Set Actual Balances</div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Count your float & cash and enter the actual amounts to correct any discrepancy.</p>
+        <div class="fg" style="margin-bottom:10px"><label>Set E-Float (KSh)</label><input type="number" id="setFloatVal" placeholder="Current float amount"></div>
+        <div class="fg" style="margin-bottom:12px"><label>Set Cash in Hand (KSh)</label><input type="number" id="setCashVal" placeholder="Current cash amount"></div>
+        <button class="btn btn-amber btn-block" onclick="setBalances()">💾 Update Balances</button>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">📋 Top-up History</div>
+        <div id="topupHistory"><div class="empty"><div class="empty-icon">🔄</div>No top-up history</div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- OTHER -->
-<div class="tab" id="tab-other">
-  <div id="oth-no-day" class="alert alert-amber" style="display:none">⚠️ Please open a business day first.</div>
-  <div id="oth-wrap">
-    <div class="other-form">
-      <div class="form-title">🔄 Other Transactions (Float Management)</div>
-      <div class="form-4col">
-        <div class="fg"><label>Type</label><select id="oth-type"><option value="buy_float">🔄 Buy E-Float</option><option value="sell_float">💵 Sell Float</option><option value="till_deposit">🏦 Till Deposit</option><option value="till_withdraw">🏧 Till Withdrawal</option></select></div>
-        <div class="fg"><label>Amount (KSh)</label><input type="number" id="oth-amount" placeholder="0" min="0"></div>
-        <div class="fg"><label>Person / Agent Name</label><input type="text" id="oth-name" placeholder="e.g. Agent name"></div>
-        <div class="fg"><label>Note</label><input type="text" id="oth-note" placeholder="Optional"></div>
+<!-- ═══════ COMMISSION ═══════ -->
+<div class="tab" id="tab-commission">
+  <div class="stitle">Commission Tracker</div>
+  <div class="stats-row" id="commStats"></div>
+  <div class="g2">
+    <div class="form-card">
+      <div class="form-card-title">💰 Safaricom Agent Commission Bands</div>
+      <div class="table-wrap" style="border:none;margin:0">
+        <table class="comm-rate-table">
+          <thead><tr><th>Amount Band (KSh)</th><th>Deposit</th><th>Withdrawal</th></tr></thead>
+          <tbody id="commBandTable"></tbody>
+        </table>
       </div>
-      <div class="btn-row"><button class="btn btn-green" onclick="recordOther()">✅ Record</button><button class="btn btn-outline" onclick="clearOthForm()">Clear</button></div>
     </div>
-    <div class="stitle">Today's Other Transactions</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Time</th><th>Type</th><th>Person / Agent</th><th>Amount (KSh)</th><th>Note</th><th></th></tr></thead>
-        <tbody id="oth-tbody"></tbody>
-      </table>
+    <div class="form-card">
+      <div class="form-card-title">📊 Commission by Type</div>
+      <div id="commByType"><div class="empty"><div class="empty-icon">💰</div>No data yet</div></div>
     </div>
   </div>
 </div>
 
-<!-- SUMMARY -->
-<div class="tab" id="tab-summary"><div id="summary-content"></div></div>
+<!-- ═══════ REPORTS ═══════ -->
+<div class="tab" id="tab-reports">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div class="stitle" style="margin:0">Reports & Analytics</div>
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-sm" onclick="setRange('today')">Today</button>
+      <button class="btn btn-secondary btn-sm" onclick="setRange('week')">Week</button>
+      <button class="btn btn-secondary btn-sm" onclick="setRange('month')">Month</button>
+      <button class="btn btn-secondary btn-sm" onclick="setRange('all')">All Time</button>
+    </div>
+  </div>
+  <div class="stats-row" id="repStats"></div>
+  <div class="g2">
+    <div class="form-card">
+      <div class="form-card-title">📊 Breakdown by Type</div>
+      <div id="repBreakdown"></div>
+    </div>
+    <div class="form-card">
+      <div class="form-card-title">📅 Commission — Last 7 Days</div>
+      <div id="repChart" style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px 0;"></div>
+    </div>
+  </div>
+</div>
 
-<!-- HISTORY -->
-<div class="tab" id="tab-history">
-  <div class="stitle">📅 Past Business Days</div>
-  <div id="history-list"></div>
+<!-- ═══════ SETTINGS ═══════ -->
+<div class="tab" id="tab-settings">
+  <div class="stitle">Agent Settings</div>
+  <div class="g2">
+    <div class="form-card">
+      <div class="form-card-title">🏪 Agent Info</div>
+      <div class="fg" style="margin-bottom:10px"><label>Agent Name / Shop</label><input type="text" id="setAgentName" placeholder="e.g. Kamau M-Pesa"></div>
+      <div class="fg" style="margin-bottom:10px"><label>Agent Number</label><input type="text" id="setAgentNo" placeholder="e.g. 123456"></div>
+      <div class="fg" style="margin-bottom:10px"><label>Till Number (if any)</label><input type="text" id="setTillNo" placeholder="Optional"></div>
+      <div class="fg" style="margin-bottom:12px"><label>Daily Float Target (KSh)</label><input type="number" id="setFloatTarget" placeholder="e.g. 50000"></div>
+      <button class="btn btn-green" onclick="saveSettings()">💾 Save Settings</button>
+    </div>
+    <div class="form-card">
+      <div class="form-card-title">🗄️ Database Setup</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
+        Run this SQL in your Supabase project to create the required tables:
+      </p>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.72rem;color:var(--green);line-height:1.7;overflow-x:auto;white-space:pre" id="sqlBlock"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="copySql()">📋 Copy SQL</button>
+    </div>
+  </div>
 </div>
 
 </main>
+
+<!-- MODALS -->
+<div class="modal-bd" id="openDayModal">
+  <div class="modal">
+    <div class="modal-title">🌅 Open Today's Day</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Enter your actual float and cash at the START of business today.</p>
+    <div class="fg" style="margin-bottom:10px"><label>Opening E-Float (KSh)</label><input type="number" id="openFloat" placeholder="e.g. 45000" min="0"></div>
+    <div class="fg" style="margin-bottom:10px"><label>Opening Cash in Hand (KSh)</label><input type="number" id="openCash" placeholder="e.g. 12000" min="0"></div>
+    <div class="fg" style="margin-bottom:10px"><label>Note (optional)</label><input type="text" id="openNote" placeholder="e.g. After morning top-up"></div>
+    <div style="background:rgba(0,165,80,.08);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted)">
+      💡 This sets your starting point for today. All transactions will be tracked against these opening balances.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('openDayModal')">Cancel</button>
+      <button class="btn btn-green" onclick="confirmOpenDay()">🌅 Open Day</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bd" id="closeDayModal">
+  <div class="modal">
+    <div class="modal-title">🌇 Close Today's Day</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Count your float and cash now, then enter the actual amounts.</p>
+    <div class="fg" style="margin-bottom:10px"><label>Closing E-Float (KSh)</label><input type="number" id="closeFloat" placeholder="Count your float" min="0"></div>
+    <div class="fg" style="margin-bottom:10px"><label>Closing Cash in Hand (KSh)</label><input type="number" id="closeCash" placeholder="Count your cash" min="0"></div>
+    <div class="fg" style="margin-bottom:10px"><label>Note (optional)</label><input type="text" id="closeNote" placeholder="e.g. All balanced"></div>
+    <div id="closePreview" style="background:var(--card);border-radius:8px;padding:12px;font-size:.82rem;margin-top:4px"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('closeDayModal')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmCloseDay()">🌇 Close Day</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-// ===================== SUPABASE INIT =====================
+// ══════════════ SUPABASE ══════════════
 const SUPABASE_URL = 'https://rgpuequojgsxpfxvsizu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJncHVlcXVvamdzeHBmeHZzaXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzcxODksImV4cCI6MjA4NzcxMzE4OX0.UXBPaUu6Yz_SwsVIprqvEh3zL2hBy3BHxl9L_8xGzbE';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let activeDay = null;
-let deposits = [], withdrawals = [], others = [];
+// ══════════════ CONSTANTS ══════════════
+const COMM_BANDS = [
+  {min:1,    max:100,   dep:0,  wdw:0,  label:'1 – 100'},
+  {min:101,  max:500,   dep:6,  wdw:6,  label:'101 – 500'},
+  {min:501,  max:1000,  dep:11, wdw:11, label:'501 – 1,000'},
+  {min:1001, max:1500,  dep:12, wdw:12, label:'1,001 – 1,500'},
+  {min:1501, max:2500,  dep:12, wdw:29, label:'1,501 – 2,500'},
+  {min:2501, max:3500,  dep:12, wdw:29, label:'2,501 – 3,500'},
+  {min:3501, max:5000,  dep:12, wdw:29, label:'3,501 – 5,000'},
+  {min:5001, max:7500,  dep:12, wdw:29, label:'5,001 – 7,500'},
+  {min:7501, max:10000, dep:12, wdw:29, label:'7,501 – 10,000'},
+  {min:10001,max:15000, dep:12, wdw:29, label:'10,001 – 15,000'},
+  {min:15001,max:20000, dep:12, wdw:67, label:'15,001 – 20,000'},
+  {min:20001,max:35000, dep:12, wdw:67, label:'20,001 – 35,000'},
+  {min:35001,max:50000, dep:12, wdw:67, label:'35,001 – 50,000'},
+  {min:50001,max:150000,dep:12, wdw:67, label:'50,001 – 150,000'},
+];
 
-// ===================== CLOCK =====================
-function pad(n){ return String(n).padStart(2,'0'); }
-function nowStr(){ let n=new Date(); return `${pad(n.getHours())}:${pad(n.getMinutes())}`; }
-function todayStr(){ let d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-function tick(){ let n=new Date(); document.getElementById('hDate').textContent=n.toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'long',year:'numeric'}); document.getElementById('hTime').textContent=n.toLocaleTimeString('en-KE'); }
-setInterval(tick,1000); tick();
-document.getElementById('open-date').value=todayStr();
+const TXN_LABELS = {deposit:'Deposit',withdrawal:'Withdrawal',send:'Send Money',airtime:'Airtime/Data',paybill:'Paybill/Till',topup:'Float Top-up'};
+const TXN_ICONS  = {deposit:'📥',withdrawal:'📤',send:'➡️',airtime:'📱',paybill:'🏦',topup:'🔄'};
 
-// ===================== SYNC STATUS =====================
-function setOnline(){ document.getElementById('syncDot').className='sync-dot'; document.getElementById('syncStatus').textContent='Live • Synced'; }
-function setOffline(){ document.getElementById('syncDot').className='sync-dot offline'; document.getElementById('syncStatus').textContent='Offline'; }
+// ══════════════ STATE ══════════════
+let txns        = [];   // from Supabase
+let days        = [];   // from Supabase
+let settings    = { agentName:'My M-Pesa', agentNo:'', tillNo:'', floatTarget:50000 };
+let floatBal    = 0;
+let cashBal     = 0;
+let todayDay    = null; // open day record
+let curType     = 'deposit';
+let curRange    = 'today';
+let topupLog    = [];
 
-// ===================== TOAST =====================
-function toast(msg,type='green'){ let t=document.getElementById('toast'); t.textContent=msg; t.style.background=type==='red'?'#e53e3e':type==='amber'?'#d97706':'#00a550'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function pad(n){return String(n).padStart(2,'0');}
+function todayStr(){const d=new Date();return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
+function nowTime(){const n=new Date();return`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;}
+const KSH=v=>`KSh ${Number(v||0).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+function todayTxns(){return txns.filter(t=>t.date===todayStr());}
+function inRange(t,r){
+  const d=new Date(t.date),now=new Date();
+  if(r==='today')return t.date===todayStr();
+  if(r==='week')return now-d<7*86400000;
+  if(r==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  return true;
+}
 
-// ===================== TABS =====================
-function switchTab(t,btn){
+// ══════════════ SYNC BADGE ══════════════
+function setOnline(){document.getElementById('syncDot').className='sync-dot';document.getElementById('syncStatus').textContent='Live • Synced';}
+function setOffline(){document.getElementById('syncDot').className='sync-dot off';document.getElementById('syncStatus').textContent='Offline';}
+
+// ══════════════ TOAST ══════════════
+function toast(msg,type='green'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='';
+  if(type==='amber')t.classList.add('t-amber');
+  else if(type==='red')t.classList.add('t-red');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ══════════════ CLOCK ══════════════
+function tick(){
+  const n=new Date();
+  document.getElementById('hDate').textContent=n.toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('hTime').textContent=n.toLocaleTimeString('en-KE');
+}
+setInterval(tick,1000);tick();
+
+// ══════════════ SETTINGS LOCAL PERSISTENCE ══════════════
+function loadLocalSettings(){
+  try{
+    const s=localStorage.getItem('mpesa_agent_settings');
+    if(s) settings=JSON.parse(s);
+    const b=localStorage.getItem('mpesa_agent_balances');
+    if(b){const p=JSON.parse(b);floatBal=p.float||0;cashBal=p.cash||0;}
+    const tl=localStorage.getItem('mpesa_topup_log');
+    if(tl) topupLog=JSON.parse(tl);
+    const td=localStorage.getItem('mpesa_today_day');
+    if(td) todayDay=JSON.parse(td);
+  }catch(e){}
+}
+function saveBalances(){
+  localStorage.setItem('mpesa_agent_balances',JSON.stringify({float:floatBal,cash:cashBal}));
+  localStorage.setItem('mpesa_topup_log',JSON.stringify(topupLog));
+  localStorage.setItem('mpesa_today_day',JSON.stringify(todayDay));
+}
+
+// ══════════════ TAB SWITCHING ══════════════
+function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(e=>e.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  if(btn) btn.classList.add('active');
-  if(t==='today')    renderDashboard();
-  if(t==='deposit')  renderDepTab();
-  if(t==='withdraw') renderWitTab();
-  if(t==='other')    renderOthTab();
-  if(t==='summary')  renderSummary();
-  if(t==='history')  renderHistory();
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  const map={
+    dashboard:renderDash,
+    transact:renderTransact,
+    records:loadRecords,
+    daybook:renderDayBook,
+    float:renderFloat,
+    commission:renderCommission,
+    reports:renderReports,
+    settings:renderSettings
+  };
+  map[name]?.();
 }
 
-// ===================== TARIFF =====================
-const TARIFF=[[1,49,0],[50,100,11],[101,2500,29],[2501,3500,52],[3501,5000,69],[5001,7500,87],[7501,10000,115],[10001,15000,167],[15001,20000,185],[20001,25000,197],[25001,30000,208],[30001,35000,220],[35001,40000,233],[40001,45000,245],[45001,50000,258],[50001,70000,290],[70001,100000,350],[100001,150000,513]];
-function getCharge(amt){ for(let [lo,hi,fee] of TARIFF){ if(amt>=lo&&amt<=hi) return fee; } return 0; }
-function autoCharge(){ let amt=parseFloat(document.getElementById('wit-amount').value)||0; let ch=getCharge(amt); document.getElementById('wit-charge').value=ch; let info=document.getElementById('wit-charge-info'); if(amt>0){info.style.display='block';info.textContent=`Safaricom charge for KSh ${amt.toLocaleString()}: KSh ${ch}`;}else info.style.display='none'; }
+// ══════════════ COMMISSION CALC ══════════════
+function getComm(amount,type){
+  const band=COMM_BANDS.find(b=>amount>=b.min&&amount<=b.max);
+  if(!band)return 0;
+  if(type==='deposit')return band.dep;
+  if(type==='withdrawal')return band.wdw;
+  return 0;
+}
 
-// ===================== LOAD TODAY'S DATA =====================
-async function loadTodayData(){
-  try {
-    let { data: days, error } = await sb.from('mpesa_days').select('*').eq('date', todayStr()).order('id', {ascending:false}).limit(1);
-    if(error) throw error;
+// ══════════════ FLOAT BAR ══════════════
+function updateFloatBar(){
+  const todayComm=todayTxns().reduce((s,t)=>s+(t.commission||0),0);
+  const target=settings.floatTarget||50000;
+  const pct=Math.min(100,(floatBal/target)*100);
+  document.getElementById('fcFloat').textContent=KSH(floatBal);
+  document.getElementById('fcCash').textContent=KSH(cashBal);
+  document.getElementById('fcComm').textContent=KSH(todayComm);
+  document.getElementById('fcTxns').textContent=todayTxns().length;
+  document.getElementById('fcTotal').textContent=KSH(floatBal+cashBal);
+  const chip=document.getElementById('fchipFloat');
+  chip.className='fchip'+(pct<20?' danger':pct<40?' warn':' good');
+}
+
+// ══════════════ DASHBOARD ══════════════
+function renderDash(){
+  updateFloatBar();
+  const today=todayTxns();
+  const comm=today.reduce((s,t)=>s+(t.commission||0),0);
+  const deps=today.filter(t=>t.type==='deposit');
+  const wdws=today.filter(t=>t.type==='withdrawal');
+  const depVol=deps.reduce((s,t)=>s+(t.amount||0),0);
+  const wdwVol=wdws.reduce((s,t)=>s+(t.amount||0),0);
+  const target=settings.floatTarget||50000;
+  const pct=Math.min(100,(floatBal/target)*100);
+
+  document.getElementById('dashStats').innerHTML=[
+    {l:'E-Float',v:KSH(floatBal),s:'Available',c:'g',a:''},
+    {l:'Cash in Hand',v:KSH(cashBal),s:'Physical cash',c:'a',a:'amber'},
+    {l:'Today Commission',v:KSH(comm),s:'Earned today',c:'g',a:''},
+    {l:'Deposits Today',v:deps.length,s:KSH(depVol)+' vol',c:'b',a:'blue'},
+    {l:'Withdrawals Today',v:wdws.length,s:KSH(wdwVol)+' vol',c:'r',a:'red'},
+    {l:'Total Assets',v:KSH(floatBal+cashBal),s:'Float + Cash',c:'g',a:''},
+  ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
+
+  document.getElementById('dashFloat').textContent=KSH(floatBal);
+  document.getElementById('dashCash').textContent=KSH(cashBal);
+  document.getElementById('floatMeter').style.width=pct+'%';
+  document.getElementById('floatMeter').className='float-fill '+(pct<20?'low':pct<40?'warn':'good');
+  document.getElementById('floatPct').textContent=pct.toFixed(0)+'% of '+KSH(target)+' target';
+  document.getElementById('dashFloatOut').textContent=KSH(depVol);
+  document.getElementById('dashFloatIn').textContent=KSH(wdwVol);
+
+  // Health warnings
+  const warnings=[];
+  if(floatBal<=0)warnings.push({c:'danger',m:'🚨 ZERO FLOAT — Cannot process deposits! Top up immediately.'});
+  else if(pct<15)warnings.push({c:'danger',m:`⚠️ CRITICAL LOW FLOAT — Only ${KSH(floatBal)} left. Top up now!`});
+  else if(pct<30)warnings.push({c:'warn',m:`⚠ Low float — ${KSH(floatBal)} remaining (${pct.toFixed(0)}% of target).`});
+  if(cashBal>floatBal*3&&floatBal>0)warnings.push({c:'info',m:`💡 Cash heavy — Consider converting ${KSH(cashBal)} cash to float.`});
+  document.getElementById('dashWarnings').innerHTML=warnings.map(w=>`<div class="warn-banner warn-${w.c}">${w.m}</div>`).join('');
+
+  // Recent
+  const recent=txns.slice(0,8);
+  document.getElementById('dashRecent').innerHTML=recent.length?recent.map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+      <div style="font-size:1.3rem">${TXN_ICONS[t.type]||'💳'}</div>
+      <div style="flex:1">
+        <div style="font-size:.84rem;font-weight:600">${TXN_LABELS[t.type]||t.type}${t.customer_name?' · '+t.customer_name:''}</div>
+        <div style="font-size:.7rem;color:var(--muted)">${t.phone||'—'} · ${t.time}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;color:${t.type==='withdrawal'?'var(--red)':'var(--green)'}">${KSH(t.amount)}</div>
+        <div style="font-size:.68rem;color:var(--muted)">Comm: ${KSH(t.commission||0)}</div>
+      </div>
+    </div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div>No transactions yet</div>';
+}
+
+// ══════════════ TRANSACTION ══════════════
+function renderTransact(){
+  const todayComm=todayTxns().reduce((s,t)=>s+(t.commission||0),0);
+  document.getElementById('txnFloat').textContent=KSH(floatBal);
+  document.getElementById('txnCash').textContent=KSH(cashBal);
+  document.getElementById('txnComm').textContent=KSH(todayComm);
+}
+
+function selectType(type){
+  curType=type;
+  document.querySelectorAll('.txn-big-btn,.txn-sm-btn').forEach(b=>b.classList.remove('active','active-red'));
+  const btn=document.querySelector(`[data-type="${type}"]`);
+  if(btn){
+    if(type==='withdrawal')btn.classList.add('active-red');
+    else btn.classList.add('active');
+  }
+  const titles={
+    deposit:'📥 Deposit — Cash in, Float out',
+    withdrawal:'📤 Withdrawal — Float in, Cash out',
+    send:'➡️ Send Money (P2P)',
+    airtime:'📱 Airtime / Data Bundle',
+    paybill:'🏦 Paybill / Till Payment',
+    topup:'🔄 Float Top-Up'
+  };
+  document.getElementById('txnFormTitle').textContent=titles[type];
+  updatePreview();
+}
+
+function updatePreview(){
+  const amt=parseFloat(document.getElementById('txnAmount').value)||0;
+  const comm=getComm(amt,curType);
+  document.getElementById('commVal').textContent=KSH(comm);
+  const band=COMM_BANDS.find(b=>amt>=b.min&&amt<=b.max);
+  document.getElementById('commBand').textContent=band?`Safaricom band: ${KSH(band.min)} – ${KSH(band.max)}`:'Enter amount to see band';
+  const todayComm=todayTxns().reduce((s,t)=>s+(t.commission||0),0);
+  document.getElementById('commNote').textContent=comm>0?`Today total after: ${KSH(todayComm+comm)}`:'';
+
+  // Impact
+  const impacts=getImpact(curType,amt,comm);
+  document.getElementById('impactRow').innerHTML=impacts.map(i=>`
+    <div class="ichip ${i.cls}"><div class="ichip-icon">${i.icon}</div><div class="ichip-label">${i.label}</div><div class="ichip-val">${i.val}</div></div>`).join('');
+
+  // Inline warning
+  const warn=document.getElementById('inlineWarn');
+  const needsFloat=['deposit','send','airtime','paybill'];
+  if(amt>0&&needsFloat.includes(curType)&&amt>floatBal){
+    warn.textContent=`⚠ You only have ${KSH(floatBal)} float — not enough!`;warn.style.display='block';
+  } else if(amt>0&&curType==='withdrawal'&&amt>cashBal){
+    warn.textContent=`⚠ You only have ${KSH(cashBal)} cash — not enough to pay out!`;warn.style.display='block';
+  } else { warn.style.display='none'; }
+}
+
+function getImpact(type,amt,comm){
+  switch(type){
+    case 'deposit':    return [{cls:'cash-up',icon:'💵',label:'Cash In',val:'+'+KSH(amt)},{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'cash-up',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
+    case 'withdrawal': return [{cls:'cash-dn',icon:'💵',label:'Cash Out',val:'-'+KSH(amt)},{cls:'float-up',icon:'📱',label:'Float In',val:'+'+KSH(amt)},{cls:'cash-up',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
+    case 'send':       return [{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
+    case 'airtime':    return [{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Margin',val:'~'+KSH(amt*.02)}];
+    case 'paybill':    return [{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
+    case 'topup':      return [{cls:'float-up',icon:'📱',label:'Float In',val:'+'+KSH(amt)},{cls:'cash-dn',icon:'💵',label:'Cash Out',val:'-'+KSH(amt)}];
+    default: return [];
+  }
+}
+
+async function submitTxn(){
+  const amt=parseFloat(document.getElementById('txnAmount').value)||0;
+  if(amt<=0){toast('Enter a valid amount','amber');return;}
+  const phone=document.getElementById('txnPhone').value.trim();
+  const customer=document.getElementById('txnCustomer').value.trim();
+  const ref=document.getElementById('txnRef').value.trim();
+  const comm=getComm(amt,curType);
+
+  // Update local balances
+  const prev={float:floatBal,cash:cashBal};
+  switch(curType){
+    case 'deposit':    floatBal-=amt; cashBal+=amt+comm; break;
+    case 'withdrawal': floatBal+=amt; cashBal-=amt; cashBal+=comm; break;
+    case 'send':       floatBal-=amt; cashBal+=comm; break;
+    case 'airtime':    floatBal-=amt; cashBal+=amt*.02; break;
+    case 'paybill':    floatBal-=amt; cashBal+=comm; break;
+    case 'topup':      floatBal+=amt; cashBal-=amt; break;
+  }
+  if(floatBal<0)toast('⚠ Float went negative! Top up needed.','amber');
+  if(cashBal<0)toast('⚠ Cash went negative!','amber');
+  saveBalances();
+
+  const rec={
+    id: Date.now(),
+    date: todayStr(),
+    time: nowTime(),
+    type: curType,
+    amount: amt,
+    phone: phone||null,
+    customer_name: customer||null,
+    reference: ref||null,
+    commission: comm,
+    float_after: floatBal,
+    cash_after: cashBal,
+  };
+
+  try{
+    const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();
+    if(error)throw error;
+    txns=[data,...txns];
     setOnline();
-    if(days && days.length){
-      activeDay = days[0];
-      let [dep, wit, oth] = await Promise.all([
-        sb.from('mpesa_deposits').select('*').eq('day_id', activeDay.id).order('id'),
-        sb.from('mpesa_withdrawals').select('*').eq('day_id', activeDay.id).order('id'),
-        sb.from('mpesa_others').select('*').eq('day_id', activeDay.id).order('id')
-      ]);
-      deposits = dep.data || [];
-      withdrawals = wit.data || [];
-      others = oth.data || [];
-    } else {
-      activeDay = null; deposits=[]; withdrawals=[]; others=[];
-    }
-  } catch(e){ setOffline(); console.error(e); }
+    const todayComm=todayTxns().reduce((s,t)=>s+(t.commission||0),0);
+    toast(`${TXN_LABELS[curType]} ✓  Commission: ${KSH(comm)}  |  Today: ${KSH(todayComm)}`);
+    resetForm();
+    updateFloatBar();
+    renderTransact();
+    renderDash();
+  }catch(e){
+    // Still save locally in txns array even if db fails
+    txns=[rec,...txns];
+    toast('Saved locally (sync issue: '+e.message+')','amber');
+    setOffline();
+    resetForm();updateFloatBar();renderTransact();
+  }
 }
 
-// ===================== OPEN / CLOSE DAY =====================
-async function openDay(){
-  let date=document.getElementById('open-date').value;
-  let openFloat=parseFloat(document.getElementById('open-float').value)||0;
-  let openMpesa=parseFloat(document.getElementById('open-mpesa').value)||0;
-  if(!date){ toast('Select a date','amber'); return; }
-  try {
-    let { data, error } = await sb.from('mpesa_days').insert({ id:Date.now(), date, open_float:openFloat, open_mpesa:openMpesa, closed:false }).select().single();
-    if(error) throw error;
-    activeDay=data; deposits=[]; withdrawals=[]; others=[];
-    toast('🌅 Day opened!'); renderDashboard();
-  } catch(e){ toast('Error: '+e.message,'red'); }
+function resetForm(){
+  document.getElementById('txnAmount').value='';
+  document.getElementById('txnPhone').value='';
+  document.getElementById('txnCustomer').value='';
+  document.getElementById('txnRef').value='';
+  document.getElementById('commVal').textContent='KSh 0';
+  document.getElementById('commBand').textContent='Enter amount to calculate';
+  document.getElementById('impactRow').innerHTML='';
+  document.getElementById('inlineWarn').style.display='none';
 }
 
-async function closeDay(){
-  let cf=parseFloat(document.getElementById('close-float').value);
-  let cm=parseFloat(document.getElementById('close-mpesa').value);
-  if(isNaN(cf)||isNaN(cm)){ toast('Enter both closing balances','amber'); return; }
-  if(!activeDay) return;
-  try {
-    let { error } = await sb.from('mpesa_days').update({ close_float:cf, close_mpesa:cm, closed:true }).eq('id', activeDay.id);
-    if(error) throw error;
-    activeDay.close_float=cf; activeDay.close_mpesa=cm; activeDay.closed=true;
-    toast('🌇 Day closed!'); renderDashboard();
-  } catch(e){ toast('Error: '+e.message,'red'); }
+// ══════════════ RECORDS ══════════════
+async function loadRecords(){
+  document.getElementById('recTable').innerHTML='<tr><td colspan="10"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>';
+  try{
+    let q=sb.from('mpesa_transactions').select('*').order('id',{ascending:false});
+    const df=document.getElementById('recFilterDate').value;
+    const tf=document.getElementById('recFilterType').value;
+    if(df)q=q.eq('date',df);
+    if(tf)q=q.eq('type',tf);
+    const{data,error}=await q;
+    if(error)throw error;
+    document.getElementById('recTable').innerHTML=data.length?data.map(t=>`<tr>
+      <td>${t.date}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${t.time}</td>
+      <td><span class="badge badge-${t.type==='deposit'?'green':t.type==='withdrawal'?'red':t.type==='topup'?'blue':'amber'}">${TXN_ICONS[t.type]} ${TXN_LABELS[t.type]}</span></td>
+      <td>${t.customer_name||'—'}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${t.phone||'—'}</td>
+      <td style="font-family:'Rajdhani',sans-serif;font-weight:700">${KSH(t.amount)}</td>
+      <td style="color:var(--green);font-family:'Rajdhani',sans-serif">${KSH(t.commission||0)}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${t.reference||'—'}</td>
+      <td style="font-size:.78rem">${getFloatEffect(t.type,t.amount)}</td>
+      <td><button class="btn btn-red btn-xs" onclick="deleteTxn(${t.id})">🗑</button></td>
+    </tr>`).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">📋</div>No records found</div></td></tr>';
+  }catch(e){document.getElementById('recTable').innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">⚠️</div>Could not load — check connection</div></td></tr>';setOffline();}
+}
+function getFloatEffect(type,amt){
+  if(type==='deposit')return`<span style="color:var(--red)">−${KSH(amt)}</span>`;
+  if(['withdrawal','topup'].includes(type))return`<span style="color:var(--green)">+${KSH(amt)}</span>`;
+  if(['send','airtime','paybill'].includes(type))return`<span style="color:var(--red)">−${KSH(amt)}</span>`;
+  return'—';
+}
+async function deleteTxn(id){
+  if(!confirm('Delete this transaction?'))return;
+  try{await sb.from('mpesa_transactions').delete().eq('id',id);txns=txns.filter(t=>t.id!==id);loadRecords();renderDash();toast('Deleted','amber');}catch(e){toast('Error','red');}
+}
+function clearRecFilter(){document.getElementById('recFilterDate').value='';document.getElementById('recFilterType').value='';loadRecords();}
+
+// ══════════════ DAY BOOK ══════════════
+async function loadDays(){
+  try{const{data}=await sb.from('mpesa_days').select('*').order('id',{ascending:false});days=data||[];}catch(e){}
 }
 
-// ===================== RECORD TRANSACTIONS =====================
-async function recordDeposit(){
-  if(!activeDay){ toast('Open a day first','amber'); return; }
-  let custName=document.getElementById('dep-cust-name').value.trim();
-  let custPhone=document.getElementById('dep-cust-phone').value.trim();
-  let custId=document.getElementById('dep-cust-id').value.trim();
-  let recvName=document.getElementById('dep-recv-name').value.trim();
-  let recvPhone=document.getElementById('dep-recv-phone').value.trim();
-  let recvId=document.getElementById('dep-recv-id').value.trim();
-  let amount=parseFloat(document.getElementById('dep-amount').value)||0;
-  let charge=parseFloat(document.getElementById('dep-charge').value)||0;
-  let note=document.getElementById('dep-note').value.trim();
-  if(!amount){ toast('Enter deposit amount','amber'); return; }
-  if(!custName){ toast('Enter customer name','amber'); return; }
-  try {
-    let rec={ id:Date.now(), day_id:activeDay.id, time:nowStr(), cust_name:custName, cust_phone:custPhone, cust_id:custId, recv_name:recvName, recv_phone:recvPhone, recv_id:recvId, amount, charge, note };
-    let { data, error } = await sb.from('mpesa_deposits').insert(rec).select().single();
-    if(error) throw error;
-    // FIX: Only add locally if not already present — prevents double entry from realtime subscription firing simultaneously
-    if(!deposits.find(x=>x.id==data.id)) deposits.push(data);
-    clearDepForm(); toast('✅ Deposit recorded!'); renderDepTab(); renderDashboard();
-  } catch(e){ toast('Error: '+e.message,'red'); }
+function renderDayBook(){
+  const isOpen=todayDay&&todayDay.date===todayStr();
+  const today=todayTxns();
+
+  // Buttons
+  document.getElementById('dayBtns').innerHTML=isOpen
+    ?`<button class="btn btn-red btn-sm" onclick="openModal('closeDayModal');prepClose()">🌇 Close Day</button>
+       <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨 Print</button>`
+    :`<button class="btn btn-green" onclick="openModal('openDayModal')">🌅 Open Day</button>`;
+
+  // Banner
+  document.getElementById('dayBanner').innerHTML=isOpen
+    ?`<div style="background:rgba(0,165,80,.1);border:1.5px solid var(--green2);border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-size:.88rem;font-weight:600;color:var(--green)">✅ Day is OPEN — ${todayStr()}</div><div style="font-size:.75rem;color:var(--muted)">Opened at ${todayDay.openTime} · ${today.length} transactions so far</div></div>`
+    :`<div class="warn-banner warn-warn">⚠ Day not opened yet. Click <strong>"🌅 Open Day"</strong> to set opening balances and start tracking.</div>`;
+
+  // Opening display
+  document.getElementById('openDisplay').innerHTML=isOpen
+    ?`<div class="bal-row"><div><div class="bal-label">Opening E-Float</div><div class="bal-val" style="color:var(--green)">${KSH(todayDay.openFloat)}</div></div><span style="font-size:1.5rem">📱</span></div>
+       <div class="bal-row"><div><div class="bal-label">Opening Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayDay.openCash)}</div></div><span style="font-size:1.5rem">💵</span></div>
+       <div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(0,165,80,.08);border-radius:8px;font-size:.82rem;margin-top:4px"><span style="color:var(--muted)">Opening Total</span><span style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(todayDay.openFloat+todayDay.openCash)}</span></div>
+       <div style="font-size:.72rem;color:var(--muted);margin-top:8px">⏰ ${todayDay.openTime}${todayDay.openNote?' · '+todayDay.openNote:''}</div>`
+    :`<div class="empty"><div class="empty-icon">🌅</div>No day opened yet</div>`;
+
+  // Closing display
+  const todayRecord=days.find(d=>d.date===todayStr());
+  document.getElementById('closeDisplay').innerHTML=(todayRecord&&todayRecord.close_float!=null)
+    ?`<div class="bal-row"><div><div class="bal-label">Closing E-Float</div><div class="bal-val" style="color:var(--red)">${KSH(todayRecord.close_float)}</div></div><span style="font-size:.85rem;font-family:'Rajdhani',sans-serif;color:${todayRecord.close_float>=todayRecord.open_float?'var(--green)':'var(--red)'}">${todayRecord.close_float>=todayRecord.open_float?'+':''}${KSH(todayRecord.close_float-todayRecord.open_float)}</span></div>
+       <div class="bal-row"><div><div class="bal-label">Closing Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayRecord.close_cash)}</div></div><span style="font-size:.85rem;font-family:'Rajdhani',sans-serif;color:${todayRecord.close_cash>=todayRecord.open_cash?'var(--green)':'var(--red)'}">${todayRecord.close_cash>=todayRecord.open_cash?'+':''}${KSH(todayRecord.close_cash-todayRecord.open_cash)}</span></div>
+       <div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(239,68,68,.06);border-radius:8px;font-size:.82rem;margin-top:4px"><span style="color:var(--muted)">Closing Total</span><span style="font-family:'Rajdhani',sans-serif;font-weight:700">${KSH(todayRecord.close_float+todayRecord.close_cash)}</span></div>
+       <div style="font-size:.72rem;color:var(--muted);margin-top:8px">⏰ ${todayRecord.close_time||''}${todayRecord.close_note?' · '+todayRecord.close_note:''}</div>`
+    :`<div class="empty"><div class="empty-icon">🌇</div>Day not closed yet</div>`;
+
+  // Summary
+  if(today.length>0||isOpen){
+    const deps=today.filter(t=>t.type==='deposit');
+    const wdws=today.filter(t=>t.type==='withdrawal');
+    const comm=today.reduce((s,t)=>s+(t.commission||0),0);
+    const depVol=deps.reduce((s,t)=>s+(t.amount||0),0);
+    const wdwVol=wdws.reduce((s,t)=>s+(t.amount||0),0);
+    const openTotal=isOpen?todayDay.openFloat+todayDay.openCash:0;
+    const curTotal=floatBal+cashBal;
+    const netChange=isOpen?curTotal-openTotal:0;
+    document.getElementById('daySummary').innerHTML=`
+      <div class="stats-row">
+        ${[
+          {l:'Deposits',v:deps.length,s:KSH(depVol),c:'g',a:''},
+          {l:'Withdrawals',v:wdws.length,s:KSH(wdwVol),c:'r',a:'red'},
+          {l:'Commission',v:KSH(comm),s:'Earned',c:'g',a:''},
+          {l:'Total Txns',v:today.length,s:'All types',c:'b',a:'blue'},
+          {l:'Net Change',v:KSH(netChange),s:netChange>=0?'Gained':'Lost',c:netChange>=0?'g':'r',a:netChange>=0?'':'red'},
+        ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('')}
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Balance Comparison</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;text-align:center;align-items:center">
+          <div><div style="font-size:.7rem;color:var(--muted)">Opening Total</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${KSH(openTotal)}</div></div>
+          <div style="font-size:1.5rem;color:var(--muted)">→</div>
+          <div><div style="font-size:.7rem;color:var(--muted)">Current Total</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:${netChange>=0?'var(--green)':'var(--red)'}">${KSH(curTotal)}</div></div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('daySummary').innerHTML='<div class="empty"><div class="empty-icon">📊</div>Open the day to start tracking</div>';
+  }
+
+  // Past days table
+  const past=days.filter(d=>d.date!==todayStr());
+  document.getElementById('dayHistTable').innerHTML=past.length?past.map(d=>{
+    const nc=(d.close_float+d.close_cash)-(d.open_float+d.open_cash);
+    return`<tr>
+      <td style="font-weight:600">${d.date}</td>
+      <td style="font-family:'Rajdhani',sans-serif;color:var(--green)">${KSH(d.open_float)}</td>
+      <td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${KSH(d.open_cash)}</td>
+      <td style="font-family:'Rajdhani',sans-serif;color:var(--red)">${d.close_float!=null?KSH(d.close_float):'—'}</td>
+      <td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${d.close_cash!=null?KSH(d.close_cash):'—'}</td>
+      <td style="font-family:'Rajdhani',sans-serif">${KSH(d.dep_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.dep_count||0} txns</span></td>
+      <td style="font-family:'Rajdhani',sans-serif">${KSH(d.wdw_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.wdw_count||0} txns</span></td>
+      <td style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(d.commission||0)}</td>
+      <td style="font-family:'Rajdhani',sans-serif;font-weight:700;color:${nc>=0?'var(--green)':'var(--red)'}">${nc>=0?'+':''}${KSH(nc)}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="9"><div class="empty"><div class="empty-icon">📅</div>No past day records</div></td></tr>';
 }
 
-async function recordWithdrawal(){
-  if(!activeDay){ toast('Open a day first','amber'); return; }
-  let custName=document.getElementById('wit-cust-name').value.trim();
-  let custPhone=document.getElementById('wit-cust-phone').value.trim();
-  let custId=document.getElementById('wit-cust-id').value.trim();
-  let amount=parseFloat(document.getElementById('wit-amount').value)||0;
-  let charge=parseFloat(document.getElementById('wit-charge').value)||0;
-  let note=document.getElementById('wit-note').value.trim();
-  if(!amount){ toast('Enter withdrawal amount','amber'); return; }
-  if(!custName){ toast('Enter customer name','amber'); return; }
-  try {
-    let rec={ id:Date.now(), day_id:activeDay.id, time:nowStr(), cust_name:custName, cust_phone:custPhone, cust_id:custId, amount, charge, note };
-    let { data, error } = await sb.from('mpesa_withdrawals').insert(rec).select().single();
-    if(error) throw error;
-    // FIX: Only add locally if not already present — prevents double entry from realtime subscription firing simultaneously
-    if(!withdrawals.find(x=>x.id==data.id)) withdrawals.push(data);
-    clearWitForm(); toast('✅ Withdrawal recorded!'); renderWitTab(); renderDashboard();
-  } catch(e){ toast('Error: '+e.message,'red'); }
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+async function confirmOpenDay(){
+  const of2=parseFloat(document.getElementById('openFloat').value);
+  const oc=parseFloat(document.getElementById('openCash').value);
+  if(isNaN(of2)||isNaN(oc)){toast('Enter both values','amber');return;}
+  todayDay={date:todayStr(),openFloat:of2,openCash:oc,openNote:document.getElementById('openNote').value,openTime:nowTime()};
+  floatBal=of2;cashBal=oc;
+  saveBalances();
+  closeModal('openDayModal');
+  document.getElementById('openFloat').value='';document.getElementById('openCash').value='';document.getElementById('openNote').value='';
+  updateFloatBar();renderDayBook();
+  toast(`Day opened! Float: ${KSH(of2)} | Cash: ${KSH(oc)}`);
 }
 
-async function recordOther(){
-  if(!activeDay){ toast('Open a day first','amber'); return; }
-  let type=document.getElementById('oth-type').value;
-  let amount=parseFloat(document.getElementById('oth-amount').value)||0;
-  let name=document.getElementById('oth-name').value.trim();
-  let note=document.getElementById('oth-note').value.trim();
-  if(!amount){ toast('Enter amount','amber'); return; }
-  try {
-    let rec={ id:Date.now(), day_id:activeDay.id, time:nowStr(), type, amount, name, note };
-    let { data, error } = await sb.from('mpesa_others').insert(rec).select().single();
-    if(error) throw error;
-    // FIX: Only add locally if not already present — prevents double entry from realtime subscription firing simultaneously
-    if(!others.find(x=>x.id==data.id)) others.push(data);
-    clearOthForm(); toast('✅ Recorded!'); renderOthTab(); renderDashboard();
-  } catch(e){ toast('Error: '+e.message,'red'); }
+function prepClose(){
+  const today=todayTxns();
+  const comm=today.reduce((s,t)=>s+(t.commission||0),0);
+  document.getElementById('closeFloat').value=floatBal;
+  document.getElementById('closeCash').value=cashBal;
+  document.getElementById('closePreview').innerHTML=`
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;font-weight:600">Expected from tracking:</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div><div style="font-size:.68rem;color:var(--muted)">Float</div><div style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(floatBal)}</div></div>
+      <div><div style="font-size:.68rem;color:var(--muted)">Cash</div><div style="font-family:'Rajdhani',sans-serif;color:var(--amber);font-weight:700">${KSH(cashBal)}</div></div>
+      <div><div style="font-size:.68rem;color:var(--muted)">Commission</div><div style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(comm)}</div></div>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted);margin-top:8px">💡 Count actual amounts and enter above. Any difference will be flagged.</div>`;
 }
 
-// ===================== DELETE =====================
-async function delDeposit(id){ if(!confirm('Delete this deposit?')) return; await sb.from('mpesa_deposits').delete().eq('id',id); deposits=deposits.filter(x=>x.id!=id); renderDepTab(); renderDashboard(); toast('🗑 Deleted','amber'); }
-async function delWithdrawal(id){ if(!confirm('Delete?')) return; await sb.from('mpesa_withdrawals').delete().eq('id',id); withdrawals=withdrawals.filter(x=>x.id!=id); renderWitTab(); renderDashboard(); toast('🗑 Deleted','amber'); }
-async function delOther(id){ if(!confirm('Delete?')) return; await sb.from('mpesa_others').delete().eq('id',id); others=others.filter(x=>x.id!=id); renderOthTab(); renderDashboard(); toast('🗑 Deleted','amber'); }
-
-// ===================== CLEAR FORMS =====================
-function clearDepForm(){ ['dep-cust-name','dep-cust-phone','dep-cust-id','dep-recv-name','dep-recv-phone','dep-recv-id','dep-amount','dep-note'].forEach(id=>document.getElementById(id).value=''); document.getElementById('dep-charge').value=0; }
-function clearWitForm(){ ['wit-cust-name','wit-cust-phone','wit-cust-id','wit-amount','wit-note'].forEach(id=>document.getElementById(id).value=''); document.getElementById('wit-charge').value=0; document.getElementById('wit-charge-info').style.display='none'; }
-function clearOthForm(){ ['oth-amount','oth-name','oth-note'].forEach(id=>document.getElementById(id).value=''); }
-
-// ===================== STATS =====================
-function calcStats(){
-  let totalDep=deposits.reduce((a,b)=>a+(b.amount||0),0);
-  let totalWit=withdrawals.reduce((a,b)=>a+(b.amount||0),0);
-  let totalCharges=withdrawals.reduce((a,b)=>a+(b.charge||0),0);
-  if(!activeDay) return {floatCash:0,eMpesa:0,totalFloat:0,totalDep,totalWit,totalCharges,depCount:deposits.length,witCount:withdrawals.length};
-  let floatCash=activeDay.open_float+totalDep-totalWit+totalCharges;
-  let eMpesa=activeDay.open_mpesa-totalDep+totalWit;
-  others.forEach(o=>{ if(o.type==='buy_float'){floatCash-=o.amount;eMpesa+=o.amount;} if(o.type==='sell_float'){floatCash+=o.amount;eMpesa-=o.amount;} if(o.type==='till_deposit'){eMpesa+=o.amount;} if(o.type==='till_withdraw'){eMpesa-=o.amount;} });
-  return {floatCash,eMpesa,totalFloat:floatCash+eMpesa,totalDep,totalWit,totalCharges,depCount:deposits.length,witCount:withdrawals.length};
+async function confirmCloseDay(){
+  const cf=parseFloat(document.getElementById('closeFloat').value);
+  const cc=parseFloat(document.getElementById('closeCash').value);
+  if(isNaN(cf)||isNaN(cc)){toast('Enter both values','amber');return;}
+  const today=todayTxns();
+  const deps=today.filter(t=>t.type==='deposit');
+  const wdws=today.filter(t=>t.type==='withdrawal');
+  const comm=today.reduce((s,t)=>s+(t.commission||0),0);
+  const rec={
+    id:Date.now(),date:todayStr(),
+    open_float:todayDay?.openFloat||0,open_cash:todayDay?.openCash||0,open_time:todayDay?.openTime||'',open_note:todayDay?.openNote||'',
+    close_float:cf,close_cash:cc,close_time:nowTime(),close_note:document.getElementById('closeNote').value,
+    dep_count:deps.length,dep_vol:deps.reduce((s,t)=>s+(t.amount||0),0),
+    wdw_count:wdws.length,wdw_vol:wdws.reduce((s,t)=>s+(t.amount||0),0),
+    commission:comm,txn_count:today.length
+  };
+  try{
+    const{data,error}=await sb.from('mpesa_days').upsert(rec,{onConflict:'date'}).select().single();
+    if(error)throw error;
+    const idx=days.findIndex(d=>d.date===todayStr());
+    if(idx>=0)days[idx]=data;else days.unshift(data);
+  }catch(e){days.unshift(rec);}
+  floatBal=cf;cashBal=cc;todayDay=null;
+  saveBalances();closeModal('closeDayModal');updateFloatBar();renderDayBook();
+  const floatDiff=cf-floatBal;const cashDiff=cc-cashBal;
+  if(Math.abs(floatDiff)>1||Math.abs(cashDiff)>1){
+    toast(`Day closed. ⚠ Discrepancy detected!`,'amber');
+  }else{
+    toast(`Day closed ✅  Commission: ${KSH(comm)}`);
+  }
 }
 
-function othLabel(type){ const m={'buy_float':'🔄 Buy Float','sell_float':'💵 Sell Float','till_deposit':'🏦 Till Dep','till_withdraw':'🏧 Till With'}; return m[type]||type; }
-function delBtn(fn,id){ return `<button class="btn btn-sm" style="background:#fee2e2;color:var(--red);border:none;cursor:pointer;border-radius:6px" onclick="${fn}('${id}')">🗑</button>`; }
+// ══════════════ FLOAT ══════════════
+function renderFloat(){
+  const target=settings.floatTarget||50000;
+  const pct=Math.min(100,(floatBal/target)*100);
+  document.getElementById('floatPageBal').textContent=KSH(floatBal);
+  document.getElementById('cashPageBal').textContent=KSH(cashBal);
+  document.getElementById('totalPageBal').textContent=KSH(floatBal+cashBal);
+  document.getElementById('floatMeter2').style.width=pct+'%';
+  document.getElementById('floatMeter2').className='float-fill '+(pct<20?'low':pct<40?'warn':'good');
+  document.getElementById('floatPct2').textContent=pct.toFixed(0)+'% of '+KSH(target)+' target'+(pct<20?' ⚠ LOW':'');
+  document.getElementById('topupHistory').innerHTML=topupLog.length?topupLog.slice(0,10).map(l=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:.84rem;font-weight:600;color:var(--green)">+${KSH(l.amount)}</div><div style="font-size:.7rem;color:var(--muted)">${l.method}${l.ref?' · '+l.ref:''}</div></div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:right">${l.date}<br>${l.time}</div>
+    </div>`).join(''):'<div class="empty"><div class="empty-icon">🔄</div>No top-up history</div>';
+}
 
-// ===================== RENDER DASHBOARD =====================
-function renderDashboard(){
-  let nop=document.getElementById('no-day-panel'), dp=document.getElementById('day-panel');
-  if(!activeDay){ nop.style.display='block'; dp.style.display='none'; return; }
-  nop.style.display='none'; dp.style.display='block';
-  document.getElementById('day-status-badge').innerHTML=`<div class="day-status ${activeDay.closed?'day-closed':'day-open'}"><div class="dot"></div>${activeDay.closed?'Day Closed':'Day Open'} — ${activeDay.date}</div>`;
-  let s=calcStats();
-  document.getElementById('live-stats').innerHTML=`
-    <div class="stat sg"><div class="stat-label">Cash Float (Till)</div><div class="stat-val pos">KSh ${s.floatCash.toLocaleString()}</div><div class="stat-sub">Opened: KSh ${(activeDay.open_float||0).toLocaleString()}</div></div>
-    <div class="stat sb"><div class="stat-label">M-Pesa E-Float</div><div class="stat-val" style="color:var(--blue)">KSh ${s.eMpesa.toLocaleString()}</div><div class="stat-sub">Opened: KSh ${(activeDay.open_mpesa||0).toLocaleString()}</div></div>
-    <div class="stat sg"><div class="stat-label">Deposits Today</div><div class="stat-val pos">KSh ${s.totalDep.toLocaleString()}</div><div class="stat-sub">${s.depCount} transactions</div></div>
-    <div class="stat sr"><div class="stat-label">Withdrawals Today</div><div class="stat-val neg">KSh ${s.totalWit.toLocaleString()}</div><div class="stat-sub">${s.witCount} transactions</div></div>
-    <div class="stat sa"><div class="stat-label">Charges Earned</div><div class="stat-val pos">KSh ${s.totalCharges.toLocaleString()}</div><div class="stat-sub">From withdrawals</div></div>
-    <div class="stat"><div class="stat-label">Total Float Value</div><div class="stat-val">KSh ${s.totalFloat.toLocaleString()}</div><div class="stat-sub">Cash + E-Float</div></div>`;
-  document.getElementById('open-actions').style.display=activeDay.closed?'none':'flex';
-  let all=[...deposits.map(d=>({...d,_t:'dep'})),...withdrawals.map(w=>({...w,_t:'wit'})),...others.map(o=>({...o,_t:'oth'}))].sort((a,b)=>b.id-a.id);
-  let tbody=document.getElementById('today-tbody');
-  if(!all.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">📭</div>No transactions yet</div></td></tr>';return;}
-  tbody.innerHTML=all.map(t=>{
-    let canDel=!activeDay.closed;
-    if(t._t==='dep') return `<tr><td>${t.time}</td><td><span class="badge bdep">📥 Deposit</span></td><td><b>${t.cust_name||'—'}</b></td><td>${t.cust_phone||'—'}</td><td style="color:var(--blue)">${t.cust_id||'—'}</td><td style="color:var(--green);font-weight:800">KSh ${(t.amount||0).toLocaleString()}</td><td>${t.charge?`KSh ${t.charge}`:'—'}</td><td><div class="pcell"><div class="pname">${t.recv_name||'—'}</div><div class="pphone">${t.recv_phone||''}</div></div></td><td style="color:var(--muted);font-size:0.78rem">${t.note||'—'}</td><td>${canDel?delBtn('delDeposit',t.id):'—'}</td></tr>`;
-    if(t._t==='wit') return `<tr><td>${t.time}</td><td><span class="badge bwit">📤 Withdrawal</span></td><td><b>${t.cust_name||'—'}</b></td><td>${t.cust_phone||'—'}</td><td style="color:var(--blue)">${t.cust_id||'—'}</td><td style="color:var(--red);font-weight:800">KSh ${(t.amount||0).toLocaleString()}</td><td style="color:var(--amber);font-weight:700">${t.charge?`KSh ${t.charge}`:'—'}</td><td>—</td><td style="color:var(--muted);font-size:0.78rem">${t.note||'—'}</td><td>${canDel?delBtn('delWithdrawal',t.id):'—'}</td></tr>`;
-    return `<tr><td>${t.time}</td><td><span class="badge bother">${othLabel(t.type)}</span></td><td colspan="2">${t.name||'—'}</td><td>—</td><td style="font-weight:700">KSh ${(t.amount||0).toLocaleString()}</td><td>—</td><td>—</td><td style="color:var(--muted);font-size:0.78rem">${t.note||'—'}</td><td>${canDel?delBtn('delOther',t.id):'—'}</td></tr>`;
+async function doTopUp(){
+  const amt=parseFloat(document.getElementById('topupAmt').value)||0;
+  if(amt<=0){toast('Enter amount','amber');return;}
+  const method=document.getElementById('topupMethod').value;
+  const ref=document.getElementById('topupRef').value.trim();
+  floatBal+=amt;cashBal-=amt;
+  topupLog.unshift({amount:amt,method,ref,date:todayStr(),time:nowTime()});
+  const rec={id:Date.now(),date:todayStr(),time:nowTime(),type:'topup',amount:amt,phone:null,customer_name:'Float Top-up',reference:ref||null,commission:0,float_after:floatBal,cash_after:cashBal};
+  try{
+    const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();
+    if(error)throw error;
+    txns=[data,...txns];setOnline();
+  }catch(e){txns=[rec,...txns];setOffline();}
+  saveBalances();renderFloat();updateFloatBar();
+  document.getElementById('topupAmt').value='';document.getElementById('topupRef').value='';
+  toast(`Float topped up: +${KSH(amt)}`);
+}
+
+function setBalances(){
+  const f=parseFloat(document.getElementById('setFloatVal').value);
+  const c=parseFloat(document.getElementById('setCashVal').value);
+  if(!isNaN(f))floatBal=f;
+  if(!isNaN(c))cashBal=c;
+  saveBalances();renderFloat();updateFloatBar();toast('Balances updated!');
+}
+
+// ══════════════ COMMISSION ══════════════
+function renderCommission(){
+  const todayComm=todayTxns().reduce((s,t)=>s+(t.commission||0),0);
+  const monthComm=txns.filter(t=>inRange(t,'month')).reduce((s,t)=>s+(t.commission||0),0);
+  const totalComm=txns.reduce((s,t)=>s+(t.commission||0),0);
+  document.getElementById('commStats').innerHTML=[
+    {l:'Today',v:KSH(todayComm),s:'Earned today',c:'g',a:''},
+    {l:'This Month',v:KSH(monthComm),s:'Month total',c:'b',a:'blue'},
+    {l:'All Time',v:KSH(totalComm),s:'Total earned',c:'g',a:''},
+    {l:'Avg per Txn',v:KSH(txns.length?totalComm/txns.length:0),s:'Average',c:'a',a:'amber'},
+  ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
+
+  document.getElementById('commBandTable').innerHTML=COMM_BANDS.map(b=>`
+    <tr><td>${b.label}</td>
+    <td style="color:var(--green);font-family:'Rajdhani',sans-serif">${b.dep>0?'KSh '+b.dep:'Free'}</td>
+    <td style="color:var(--red);font-family:'Rajdhani',sans-serif">${b.wdw>0?'KSh '+b.wdw:'Free'}</td></tr>`).join('');
+
+  const byType={};
+  txns.forEach(t=>{if(!byType[t.type])byType[t.type]={c:0,comm:0};byType[t.type].c++;byType[t.type].comm+=t.commission||0;});
+  const maxC=Math.max(...Object.values(byType).map(v=>v.comm),1);
+  document.getElementById('commByType').innerHTML=Object.entries(byType).sort((a,b)=>b[1].comm-a[1].comm).map(([type,d])=>`
+    <div class="rep-bar">
+      <div class="rep-bar-label">${TXN_ICONS[type]} ${TXN_LABELS[type]||type}</div>
+      <div class="rep-bar-track"><div class="rep-bar-fill" style="width:${(d.comm/maxC*100).toFixed(1)}%"></div></div>
+      <div class="rep-bar-val">${KSH(d.comm)}</div>
+    </div>`).join('')||'<div class="empty"><div class="empty-icon">💰</div>No data yet</div>';
+}
+
+// ══════════════ REPORTS ══════════════
+function setRange(r){curRange=r;renderReports();}
+function renderReports(){
+  const recs=txns.filter(t=>inRange(t,curRange));
+  const vol=recs.reduce((s,t)=>s+(t.amount||0),0);
+  const comm=recs.reduce((s,t)=>s+(t.commission||0),0);
+  const deps=recs.filter(t=>t.type==='deposit');
+  const wdws=recs.filter(t=>t.type==='withdrawal');
+  document.getElementById('repStats').innerHTML=[
+    {l:'Total Volume',v:KSH(vol),s:'All transactions',c:'b',a:'blue'},
+    {l:'Commission Earned',v:KSH(comm),s:curRange,c:'g',a:''},
+    {l:'Deposits',v:deps.length,s:KSH(deps.reduce((s,t)=>s+(t.amount||0),0)),c:'g',a:''},
+    {l:'Withdrawals',v:wdws.length,s:KSH(wdws.reduce((s,t)=>s+(t.amount||0),0)),c:'r',a:'red'},
+  ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
+
+  const byType={};
+  recs.forEach(t=>{if(!byType[t.type])byType[t.type]={c:0,vol:0,comm:0};byType[t.type].c++;byType[t.type].vol+=t.amount||0;byType[t.type].comm+=t.commission||0;});
+  const maxV=Math.max(...Object.values(byType).map(v=>v.vol),1);
+  document.getElementById('repBreakdown').innerHTML=Object.entries(byType).sort((a,b)=>b[1].vol-a[1].vol).map(([type,d])=>`
+    <div class="rep-bar" style="flex-direction:column;align-items:stretch;gap:4px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:.8rem">
+        <span>${TXN_ICONS[type]} ${TXN_LABELS[type]||type} <span style="color:var(--muted)">(${d.c} txns)</span></span>
+        <span style="color:var(--green);font-family:'Rajdhani',sans-serif">${KSH(d.comm)} comm</span>
+      </div>
+      <div class="rep-bar-track" style="height:8px"><div class="rep-bar-fill" style="width:${(d.vol/maxV*100).toFixed(1)}%"></div></div>
+      <div style="font-size:.7rem;color:var(--muted)">Vol: ${KSH(d.vol)}</div>
+    </div>`).join('')||'<div class="empty"><div class="empty-icon">📊</div>No data</div>';
+
+  // 7-day commission chart
+  const days7=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;days7.push({lbl:d.toLocaleDateString(undefined,{weekday:'short'}),date:ds});}
+  const maxD=Math.max(...days7.map(d=>txns.filter(t=>t.date===d.date).reduce((s,t)=>s+(t.commission||0),0)),1);
+  document.getElementById('repChart').innerHTML=days7.map(d=>{
+    const val=txns.filter(t=>t.date===d.date).reduce((s,t)=>s+(t.commission||0),0);
+    const h=Math.max(3,(val/maxD*100)).toFixed(1);
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="font-size:.58rem;color:var(--green);font-family:'Rajdhani',sans-serif">${val?val.toFixed(0):''}</div>
+      <div style="width:100%;background:linear-gradient(180deg,var(--green3),var(--green));border-radius:3px 3px 0 0;min-height:2px;height:${h}%"></div>
+      <div style="font-size:.62rem;color:var(--muted)">${d.lbl}</div>
+    </div>`;
   }).join('');
 }
 
-function renderDepTab(){
-  document.getElementById('dep-no-day').style.display=!activeDay?'block':'none';
-  document.getElementById('dep-wrap').style.opacity=!activeDay?'0.5':'1';
-  document.getElementById('dep-wrap').style.pointerEvents=!activeDay?'none':'auto';
-  let tbody=document.getElementById('dep-tbody');
-  if(!deposits.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">📥</div>No deposits today</div></td></tr>';return;}
-  tbody.innerHTML=[...deposits].reverse().map(d=>`<tr><td>${d.time}</td><td><div class="pcell"><div class="pname">${d.cust_name||'—'}</div></div></td><td>${d.cust_phone||'—'}</td><td style="color:var(--blue)">${d.cust_id||'—'}</td><td>${d.recv_name||'—'}</td><td>${d.recv_phone||'—'}</td><td style="color:var(--green);font-weight:800">KSh ${(d.amount||0).toLocaleString()}</td><td>${d.charge?`KSh ${d.charge}`:'—'}</td><td style="color:var(--muted);font-size:0.78rem">${d.note||'—'}</td><td>${activeDay&&!activeDay.closed?delBtn('delDeposit',d.id):'—'}</td></tr>`).join('');
+// ══════════════ SETTINGS ══════════════
+function renderSettings(){
+  document.getElementById('setAgentName').value=settings.agentName||'';
+  document.getElementById('setAgentNo').value=settings.agentNo||'';
+  document.getElementById('setTillNo').value=settings.tillNo||'';
+  document.getElementById('setFloatTarget').value=settings.floatTarget||50000;
+
+  const sql=`-- Run this SQL in Supabase → SQL Editor
+
+create table if not exists mpesa_transactions (
+  id bigint primary key,
+  date text,
+  time text,
+  type text,
+  amount numeric default 0,
+  phone text,
+  customer_name text,
+  reference text,
+  commission numeric default 0,
+  float_after numeric default 0,
+  cash_after numeric default 0,
+  created_at timestamptz default now()
+);
+
+create table if not exists mpesa_days (
+  id bigint primary key,
+  date text unique,
+  open_float numeric default 0,
+  open_cash numeric default 0,
+  open_time text,
+  open_note text,
+  close_float numeric,
+  close_cash numeric,
+  close_time text,
+  close_note text,
+  dep_count int default 0,
+  dep_vol numeric default 0,
+  wdw_count int default 0,
+  wdw_vol numeric default 0,
+  commission numeric default 0,
+  txn_count int default 0
+);
+
+-- Enable real-time
+alter publication supabase_realtime
+  add table mpesa_transactions, mpesa_days;`;
+
+  document.getElementById('sqlBlock').textContent=sql;
 }
 
-function renderWitTab(){
-  document.getElementById('wit-no-day').style.display=!activeDay?'block':'none';
-  document.getElementById('wit-wrap').style.opacity=!activeDay?'0.5':'1';
-  document.getElementById('wit-wrap').style.pointerEvents=!activeDay?'none':'auto';
-  let tbody=document.getElementById('wit-tbody');
-  if(!withdrawals.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">📤</div>No withdrawals today</div></td></tr>';return;}
-  tbody.innerHTML=[...withdrawals].reverse().map(w=>`<tr><td>${w.time}</td><td><div class="pcell"><div class="pname">${w.cust_name||'—'}</div></div></td><td>${w.cust_phone||'—'}</td><td style="color:var(--blue)">${w.cust_id||'—'}</td><td style="color:var(--red);font-weight:800">KSh ${(w.amount||0).toLocaleString()}</td><td style="color:var(--amber);font-weight:700">KSh ${(w.charge||0).toLocaleString()}</td><td style="color:var(--muted);font-size:0.78rem">${w.note||'—'}</td><td>${activeDay&&!activeDay.closed?delBtn('delWithdrawal',w.id):'—'}</td></tr>`).join('');
+function saveSettings(){
+  settings.agentName=document.getElementById('setAgentName').value||'My M-Pesa';
+  settings.agentNo=document.getElementById('setAgentNo').value;
+  settings.tillNo=document.getElementById('setTillNo').value;
+  settings.floatTarget=parseFloat(document.getElementById('setFloatTarget').value)||50000;
+  localStorage.setItem('mpesa_agent_settings',JSON.stringify(settings));
+  document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();
+  toast('Settings saved!');
 }
 
-function renderOthTab(){
-  document.getElementById('oth-no-day').style.display=!activeDay?'block':'none';
-  document.getElementById('oth-wrap').style.opacity=!activeDay?'0.5':'1';
-  document.getElementById('oth-wrap').style.pointerEvents=!activeDay?'none':'auto';
-  let tbody=document.getElementById('oth-tbody');
-  if(!others.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">🔄</div>No other transactions</div></td></tr>';return;}
-  tbody.innerHTML=[...others].reverse().map(o=>`<tr><td>${o.time}</td><td><span class="badge bother">${othLabel(o.type)}</span></td><td>${o.name||'—'}</td><td style="font-weight:700">KSh ${(o.amount||0).toLocaleString()}</td><td style="color:var(--muted);font-size:0.78rem">${o.note||'—'}</td><td>${activeDay&&!activeDay.closed?delBtn('delOther',o.id):'—'}</td></tr>`).join('');
+function copySql(){
+  navigator.clipboard.writeText(document.getElementById('sqlBlock').textContent)
+    .then(()=>toast('SQL copied!'))
+    .catch(()=>toast('Copy manually from the box','amber'));
 }
 
-async function renderSummary(){
-  let day=activeDay;
-  if(!day){
-    let {data}=await sb.from('mpesa_days').select('*').eq('closed',true).order('id',{ascending:false}).limit(1);
-    if(data&&data.length){ day=data[0]; let [dep,wit,oth]=await Promise.all([sb.from('mpesa_deposits').select('*').eq('day_id',day.id),sb.from('mpesa_withdrawals').select('*').eq('day_id',day.id),sb.from('mpesa_others').select('*').eq('day_id',day.id)]); deposits=dep.data||[]; withdrawals=wit.data||[]; others=oth.data||[]; }
-  }
-  if(!day){document.getElementById('summary-content').innerHTML='<div class="empty"><div class="empty-icon">📋</div>No data yet.</div>';return;}
-  let s=calcStats();
-  let variance=day.closed?(day.close_float+day.close_mpesa)-(s.floatCash+s.eMpesa):null;
-  document.getElementById('summary-content').innerHTML=`
-    <div class="day-status ${day.closed?'day-closed':'day-open'}"><div class="dot"></div>${day.closed?'Closed':'Open'} — ${day.date}</div>
-    <div class="summary-row">
-      <div class="summary-box"><h3>💰 FLOAT POSITION</h3>
-        <div class="sum-row"><span>Opening Cash Float</span><span>KSh ${(day.open_float||0).toLocaleString()}</span></div>
-        <div class="sum-row"><span>Opening E-Float</span><span>KSh ${(day.open_mpesa||0).toLocaleString()}</span></div>
-        <div class="sum-row"><span>Current Cash Float</span><span class="profit">KSh ${s.floatCash.toLocaleString()}</span></div>
-        <div class="sum-row"><span>Current E-Float</span><span style="color:var(--blue)">KSh ${s.eMpesa.toLocaleString()}</span></div>
-        ${day.closed?`<div class="sum-row"><span>Closing Float (Actual)</span><span>KSh ${(day.close_float||0).toLocaleString()}</span></div><div class="sum-row"><span>Closing E-Float (Actual)</span><span>KSh ${(day.close_mpesa||0).toLocaleString()}</span></div><div class="sum-row"><span>Variance</span><span class="${variance>=0?'profit':'loss'}">${variance>=0?'+':''}KSh ${variance.toLocaleString()}</span></div>`:''}
-        <div class="sum-row"><span>Total Float</span><span>KSh ${s.totalFloat.toLocaleString()}</span></div>
-      </div>
-      <div class="summary-box"><h3>📊 TRANSACTIONS</h3>
-        <div class="sum-row"><span>Total Deposited</span><span class="profit">KSh ${s.totalDep.toLocaleString()}</span></div>
-        <div class="sum-row"><span>No. of Deposits</span><span>${s.depCount}</span></div>
-        <div class="sum-row"><span>Total Withdrawn</span><span class="loss">KSh ${s.totalWit.toLocaleString()}</span></div>
-        <div class="sum-row"><span>No. of Withdrawals</span><span>${s.witCount}</span></div>
-        <div class="sum-row"><span>Charges Earned</span><span class="profit">KSh ${s.totalCharges.toLocaleString()}</span></div>
-        <div class="sum-row"><span>Total Transactions</span><span>${s.depCount+s.witCount+others.length}</span></div>
-      </div>
-    </div>
-    <div class="stitle">📥 All Deposits</div>
-    <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>Time</th><th>Customer</th><th>Phone</th><th>ID</th><th>Receiver</th><th>Recv Phone</th><th>Amount (KSh)</th><th>Charge</th><th>Note</th></tr></thead>
-    <tbody>${deposits.length?[...deposits].reverse().map(d=>`<tr><td>${d.time}</td><td><b>${d.cust_name||'—'}</b></td><td>${d.cust_phone||'—'}</td><td style="color:var(--blue)">${d.cust_id||'—'}</td><td>${d.recv_name||'—'}</td><td>${d.recv_phone||'—'}</td><td style="color:var(--green);font-weight:800">KSh ${(d.amount||0).toLocaleString()}</td><td>${d.charge?`KSh ${d.charge}`:'—'}</td><td style="color:var(--muted)">${d.note||'—'}</td></tr>`).join(''):'<tr><td colspan="9"><div class="empty" style="padding:18px">No deposits</div></td></tr>'}</tbody></table></div>
-    <div class="stitle">📤 All Withdrawals</div>
-    <div class="table-wrap"><table><thead><tr><th>Time</th><th>Customer</th><th>Phone</th><th>ID</th><th>Amount Withdrawn (KSh)</th><th>Charge Earned (KSh)</th><th>Note</th></tr></thead>
-    <tbody>${withdrawals.length?[...withdrawals].reverse().map(w=>`<tr><td>${w.time}</td><td><b>${w.cust_name||'—'}</b></td><td>${w.cust_phone||'—'}</td><td style="color:var(--blue)">${w.cust_id||'—'}</td><td style="color:var(--red);font-weight:800">KSh ${(w.amount||0).toLocaleString()}</td><td style="color:var(--amber);font-weight:700">KSh ${(w.charge||0).toLocaleString()}</td><td style="color:var(--muted)">${w.note||'—'}</td></tr>`).join(''):'<tr><td colspan="7"><div class="empty" style="padding:18px">No withdrawals</div></td></tr>'}</tbody></table></div>`;
-}
-
-async function renderHistory(){
-  let {data:days}=await sb.from('mpesa_days').select('*').eq('closed',true).order('id',{ascending:false});
-  let el=document.getElementById('history-list');
-  if(!days||!days.length){el.innerHTML='<div class="empty"><div class="empty-icon">📅</div>No closed days yet</div>';return;}
-  let html='';
-  for(let day of days){
-    let [dep,wit]=await Promise.all([sb.from('mpesa_deposits').select('amount,charge').eq('day_id',day.id),sb.from('mpesa_withdrawals').select('amount,charge').eq('day_id',day.id)]);
-    let totalDep=(dep.data||[]).reduce((a,b)=>a+(b.amount||0),0);
-    let totalWit=(wit.data||[]).reduce((a,b)=>a+(b.amount||0),0);
-    let totalCharges=(wit.data||[]).reduce((a,b)=>a+(b.charge||0),0);
-    let expectedFloat=day.open_float+day.open_mpesa+totalCharges;
-    let actualFloat=(day.close_float||0)+(day.close_mpesa||0);
-    let variance=actualFloat-expectedFloat;
-    html+=`<div class="history-day"><div class="history-day-header"><h3>📅 ${day.date}</h3><span class="badge ${variance>=0?'bdep':'bwit'}">Variance: ${variance>=0?'+':''}KSh ${variance.toLocaleString()}</span></div><div class="day-stats"><div class="day-stat">Open Float: <strong>KSh ${(day.open_float||0).toLocaleString()}</strong></div><div class="day-stat">Open E-Float: <strong>KSh ${(day.open_mpesa||0).toLocaleString()}</strong></div><div class="day-stat">Close Float: <strong>KSh ${(day.close_float||0).toLocaleString()}</strong></div><div class="day-stat">Close E-Float: <strong>KSh ${(day.close_mpesa||0).toLocaleString()}</strong></div><div class="day-stat">Deposits: <strong style="color:var(--green)">${(dep.data||[]).length} | KSh ${totalDep.toLocaleString()}</strong></div><div class="day-stat">Withdrawals: <strong style="color:var(--red)">${(wit.data||[]).length} | KSh ${totalWit.toLocaleString()}</strong></div><div class="day-stat">Charges: <strong style="color:var(--amber)">KSh ${totalCharges.toLocaleString()}</strong></div></div></div>`;
-  }
-  el.innerHTML=html;
-}
-
-// ===================== REAL-TIME SUBSCRIPTION =====================
+// ══════════════ REAL-TIME ══════════════
 function subscribeRealtime(){
   sb.channel('mpesa-changes')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_deposits'},payload=>{
-      if(activeDay&&payload.new.day_id==activeDay.id){
-        // FIX: Only add if not already present — prevents double entry when local insert and realtime both fire
-        if(!deposits.find(x=>x.id==payload.new.id)){
-          deposits.push(payload.new);
-          renderDepTab(); renderDashboard(); toast('📥 New deposit synced!');
-        }
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_transactions'},payload=>{
+      if(!txns.find(t=>t.id==payload.new.id)){
+        txns=[payload.new,...txns];
+        updateFloatBar();renderDash();
+        toast(`🔔 ${TXN_LABELS[payload.new.type]} synced — ${KSH(payload.new.amount)}`);
       }
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_withdrawals'},payload=>{
-      if(activeDay&&payload.new.day_id==activeDay.id){
-        // FIX: Only add if not already present — prevents double entry when local insert and realtime both fire
-        if(!withdrawals.find(x=>x.id==payload.new.id)){
-          withdrawals.push(payload.new);
-          renderWitTab(); renderDashboard(); toast('📤 New withdrawal synced!');
-        }
-      }
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'mpesa_transactions'},payload=>{
+      txns=txns.filter(t=>t.id!=payload.old.id);updateFloatBar();renderDash();
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_others'},payload=>{
-      if(activeDay&&payload.new.day_id==activeDay.id){
-        // FIX: Only add if not already present — prevents double entry when local insert and realtime both fire
-        if(!others.find(x=>x.id==payload.new.id)){
-          others.push(payload.new);
-          renderOthTab(); renderDashboard();
-        }
-      }
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_days'},payload=>{
+      const idx=days.findIndex(d=>d.date==payload.new.date);
+      if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);
     })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'mpesa_deposits'},payload=>{
-      deposits=deposits.filter(x=>x.id!=payload.old.id); renderDepTab(); renderDashboard();
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_days'},payload=>{
+      const idx=days.findIndex(d=>d.date==payload.new.date);
+      if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);
     })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'mpesa_withdrawals'},payload=>{
-      withdrawals=withdrawals.filter(x=>x.id!=payload.old.id); renderWitTab(); renderDashboard();
-    })
-    .subscribe(status=>{ if(status==='SUBSCRIBED') setOnline(); else setOffline(); });
+    .subscribe(status=>{
+      if(status==='SUBSCRIBED')setOnline();else setOffline();
+    });
 }
 
-// ===================== INIT =====================
+// ══════════════ INIT ══════════════
 async function init(){
-  await loadTodayData();
-  renderDashboard();
+  loadLocalSettings();
+  document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();
+
+  // Load transactions from Supabase
+  try{
+    const{data,error}=await sb.from('mpesa_transactions').select('*').order('id',{ascending:false});
+    if(error)throw error;
+    txns=data||[];setOnline();
+  }catch(e){setOffline();}
+
+  // Load days from Supabase
+  await loadDays();
+
+  updateFloatBar();
+  renderDash();
+  selectType('deposit');
   subscribeRealtime();
 }
+
 init();
 </script>
 </body>
