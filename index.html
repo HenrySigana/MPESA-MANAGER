@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,39 +199,28 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
       <div class="form-card" style="padding:0;overflow:hidden"><div id="dashRecent"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
     </div>
   </div>
-
-  <!-- ── ANALYTICS CHARTS ── -->
   <div class="stitle" style="margin-top:8px">📊 Visual Analytics</div>
   <div class="analytics-grid">
-
-    <!-- Chart 1: Daily Commission Bar Chart -->
     <div class="chart-card">
       <div class="chart-title">💰 Daily Commission — Last 14 Days</div>
       <div class="chart-subtitle" id="commChartSub">Loading...</div>
       <div class="bar-chart-wrap" id="commBarChart"></div>
     </div>
-
-    <!-- Chart 2: Transaction Volume Over Time -->
     <div class="chart-card">
       <div class="chart-title">📈 Transaction Volume — Last 14 Days</div>
       <div class="chart-subtitle" id="volChartSub">Loading...</div>
       <div class="bar-chart-wrap" id="volBarChart"></div>
     </div>
-
-    <!-- Chart 3: Deposit vs Withdrawal -->
     <div class="chart-card">
       <div class="chart-title">⚖️ Deposits vs Withdrawals</div>
       <div class="chart-subtitle" id="dvwSub">Today's breakdown</div>
       <div id="dvwChart" style="padding:8px 0"></div>
     </div>
-
-    <!-- Chart 4: Best Days -->
     <div class="chart-card">
       <div class="chart-title">🏆 Your Best Days</div>
       <div class="chart-subtitle">Top 5 by commission earned</div>
       <div id="bestDaysChart" style="padding:8px 0"></div>
     </div>
-
   </div>
 </div>
 <!-- NEW TRANSACTION -->
@@ -429,8 +417,6 @@ const TXN_LABELS={deposit:'Deposit',withdrawal:'Withdrawal',send:'Send Money',ai
 const TXN_ICONS={deposit:'📥',withdrawal:'📤',send:'➡️',airtime:'📱',paybill:'🏦',topup:'🔄'};
 const STATE_KEY='shared';
 
-// ── STATE ──
-// floatBal, cashBal, todayDay are synced FROM Supabase, NOT localStorage
 let txns=[],days=[],topupLog=[];
 let settings={agentName:'My M-Pesa',agentNo:'',tillNo:'',floatTarget:50000};
 let floatBal=0,cashBal=0,todayDay=null;
@@ -463,9 +449,6 @@ function loadLocalSettings(){
   try{const s=localStorage.getItem('mpesa_agent_settings');if(s)settings=JSON.parse(s);const tl=localStorage.getItem('mpesa_topup_log');if(tl)topupLog=JSON.parse(tl);}catch(e){}
 }
 
-// ════════════════════════════════════
-// ⭐ FIX: Shared state in Supabase
-// ════════════════════════════════════
 async function loadSharedState(){
   try{
     const{data,error}=await sb.from('mpesa_state').select('*').eq('id',STATE_KEY).single();
@@ -507,12 +490,12 @@ function updateFloatBar(){
   document.getElementById('fcCash').textContent=KSH(cashBal);
   document.getElementById('fcComm').textContent=KSH(todayComm);
   document.getElementById('fcTxns').textContent=todayTxns().length;
+  // ✅ FIXED: Total Assets = Float + Cash only. Commission is view-only, NOT added to balances.
   document.getElementById('fcTotal').textContent=KSH(floatBal+cashBal);
   const chip=document.getElementById('fchipFloat');
   chip.className='fchip'+(pct<20?' danger':pct<40?' warn':' good');
 }
 
-// ══════ ANALYTICS CHARTS ══════
 function getLast14Days(){
   const days=[];
   for(let i=13;i>=0;i--){
@@ -599,7 +582,6 @@ function renderDvwChart(){
 }
 
 function renderBestDaysChart(){
-  // Group txns by date, sum commission
   const byDate={};
   txns.forEach(t=>{
     if(!byDate[t.date])byDate[t.date]={commission:0,count:0,vol:0};
@@ -642,8 +624,8 @@ function renderDash(){
   const pct=Math.min(100,(floatBal/target)*100);
   document.getElementById('dashStats').innerHTML=[
     {l:'E-Float',v:KSH(floatBal),s:'Available',c:'g',a:''},{l:'Cash in Hand',v:KSH(cashBal),s:'Physical cash',c:'a',a:'amber'},
-    {l:'Today Commission',v:KSH(comm),s:'Earned today',c:'g',a:''},{l:'Deposits Today',v:deps.length,s:KSH(depVol)+' vol',c:'b',a:'blue'},
-    {l:'Withdrawals Today',v:wdws.length,s:KSH(wdwVol)+' vol',c:'r',a:'red'},{l:'Total Assets',v:KSH(floatBal+cashBal),s:'Float + Cash',c:'g',a:''},
+    {l:'Today Commission',v:KSH(comm),s:'View only — not in assets',c:'g',a:''},{l:'Deposits Today',v:deps.length,s:KSH(depVol)+' vol',c:'b',a:'blue'},
+    {l:'Withdrawals Today',v:wdws.length,s:KSH(wdwVol)+' vol',c:'r',a:'red'},{l:'Total Assets',v:KSH(floatBal+cashBal),s:'Float + Cash only',c:'g',a:''},
   ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
   document.getElementById('dashFloat').textContent=KSH(floatBal);
   document.getElementById('dashCash').textContent=KSH(cashBal);
@@ -665,7 +647,6 @@ function renderDash(){
       <div style="flex:1"><div style="font-size:.84rem;font-weight:600">${TXN_LABELS[t.type]||t.type}${t.customer_name?' · '+t.customer_name:''}</div><div style="font-size:.7rem;color:var(--muted)">${t.phone||'—'} · ${t.time}</div></div>
       <div style="text-align:right"><div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;color:${t.type==='withdrawal'?'var(--red)':'var(--green)'}">${KSH(t.amount)}</div><div style="font-size:.68rem;color:var(--muted)">Comm: ${KSH(t.commission||0)}</div></div>
     </div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div>No transactions yet</div>';
-  // Render analytics charts
   renderAnalytics();
 }
 
@@ -704,12 +685,13 @@ function updatePreview(){
 }
 
 function getImpact(type,amt,comm){
+  // Commission shown as informational only — not added to cash/float
   switch(type){
-    case 'deposit':return[{cls:'cash-up',icon:'💵',label:'Cash In',val:'+'+KSH(amt)},{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'cash-up',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
-    case 'withdrawal':return[{cls:'cash-dn',icon:'💵',label:'Cash Out',val:'-'+KSH(amt)},{cls:'float-up',icon:'📱',label:'Float In',val:'+'+KSH(amt)},{cls:'cash-up',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
-    case 'send':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
-    case 'airtime':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Margin',val:'~'+KSH(amt*.02)}];
-    case 'paybill':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:'+'+KSH(comm)}];
+    case 'deposit':return[{cls:'cash-up',icon:'💵',label:'Cash In',val:'+'+KSH(amt)},{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:KSH(comm)+' earned'}];
+    case 'withdrawal':return[{cls:'cash-dn',icon:'💵',label:'Cash Out',val:'-'+KSH(amt)},{cls:'float-up',icon:'📱',label:'Float In',val:'+'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:KSH(comm)+' earned'}];
+    case 'send':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:KSH(comm)+' earned'}];
+    case 'airtime':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Margin',val:'~'+KSH(amt*.02)+' earned'}];
+    case 'paybill':return[{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:KSH(comm)+' earned'}];
     case 'topup':return[{cls:'float-up',icon:'📱',label:'Float In',val:'+'+KSH(amt)},{cls:'cash-dn',icon:'💵',label:'Cash Out',val:'-'+KSH(amt)}];
     default:return[];
   }
@@ -722,17 +704,20 @@ async function submitTxn(){
   const customer=document.getElementById('txnCustomer').value.trim();
   const ref=document.getElementById('txnRef').value.trim();
   const comm=getComm(amt,curType);
+
+  // ✅ FIXED: Commission is tracked for reporting only — NOT added to float or cash.
+  // Real-world: Safaricom pays commission separately; it does not physically appear in your till.
   switch(curType){
-    case 'deposit':floatBal-=amt;cashBal+=amt+comm;break;
-    case 'withdrawal':floatBal+=amt;cashBal-=amt;cashBal+=comm;break;
-    case 'send':floatBal-=amt;cashBal+=comm;break;
-    case 'airtime':floatBal-=amt;cashBal+=amt*.02;break;
-    case 'paybill':floatBal-=amt;cashBal+=comm;break;
-    case 'topup':floatBal+=amt;cashBal-=amt;break;
+    case 'deposit':   floatBal -= amt; cashBal += amt; break;  // Customer gives cash, you send float
+    case 'withdrawal':floatBal += amt; cashBal -= amt; break;  // Customer gives float, you give cash
+    case 'send':      floatBal -= amt; break;                   // Float used to send
+    case 'airtime':   floatBal -= amt; break;                   // Float used to buy airtime
+    case 'paybill':   floatBal -= amt; break;                   // Float used for bill
+    case 'topup':     floatBal += amt; cashBal -= amt; break;   // Convert cash to float
   }
+
   if(floatBal<0)toast('⚠ Float went negative! Top up needed.','amber');
   if(cashBal<0)toast('⚠ Cash went negative!','amber');
-  // ⭐ Save shared balances to Supabase immediately
   await saveSharedState();
   const rec={id:Date.now(),date:todayStr(),time:nowTime(),type:curType,amount:amt,phone:phone||null,customer_name:customer||null,reference:ref||null,commission:comm,float_after:floatBal,cash_after:cashBal};
   try{
@@ -812,11 +797,11 @@ function renderDayBook(){
     const curTotal=floatBal+cashBal;const netChange=isOpen?curTotal-openTotal:0;
     document.getElementById('daySummary').innerHTML=`
       <div class="stats-row">
-        ${[{l:'Deposits',v:deps.length,s:KSH(depVol),c:'g',a:''},{l:'Withdrawals',v:wdws.length,s:KSH(wdwVol),c:'r',a:'red'},{l:'Commission',v:KSH(comm),s:'Earned',c:'g',a:''},{l:'Total Txns',v:today.length,s:'All types',c:'b',a:'blue'},{l:'Net Change',v:KSH(netChange),s:netChange>=0?'Gained':'Lost',c:netChange>=0?'g':'r',a:netChange>=0?'':'red'}]
+        ${[{l:'Deposits',v:deps.length,s:KSH(depVol),c:'g',a:''},{l:'Withdrawals',v:wdws.length,s:KSH(wdwVol),c:'r',a:'red'},{l:'Commission',v:KSH(comm),s:'Tracked separately',c:'g',a:''},{l:'Total Txns',v:today.length,s:'All types',c:'b',a:'blue'},{l:'Net Change',v:KSH(netChange),s:netChange>=0?'Gained':'Lost',c:netChange>=0?'g':'r',a:netChange>=0?'':'red'}]
         .map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('')}
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
-        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Balance Comparison</div>
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Balance Comparison (Float + Cash only)</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;text-align:center;align-items:center">
           <div><div style="font-size:.7rem;color:var(--muted)">Opening Total</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${KSH(openTotal)}</div></div>
           <div style="font-size:1.5rem;color:var(--muted)">→</div>
@@ -840,7 +825,6 @@ async function confirmOpenDay(){
   if(isNaN(of2)||isNaN(oc)){toast('Enter both values','amber');return;}
   todayDay={date:todayStr(),openFloat:of2,openCash:oc,openNote:document.getElementById('openNote').value,openTime:nowTime()};
   floatBal=of2;cashBal=oc;
-  // ⭐ Save to Supabase so all devices see opening values
   await saveSharedState();
   closeModal('openDayModal');
   ['openFloat','openCash','openNote'].forEach(id=>document.getElementById(id).value='');
@@ -864,7 +848,6 @@ async function confirmCloseDay(){
   const rec={id:Date.now(),date:todayStr(),open_float:todayDay?.openFloat||0,open_cash:todayDay?.openCash||0,open_time:todayDay?.openTime||'',open_note:todayDay?.openNote||'',close_float:cf,close_cash:cc,close_time:nowTime(),close_note:document.getElementById('closeNote').value,dep_count:deps.length,dep_vol:deps.reduce((s,t)=>s+(t.amount||0),0),wdw_count:wdws.length,wdw_vol:wdws.reduce((s,t)=>s+(t.amount||0),0),commission:comm,txn_count:today.length};
   try{const{data,error}=await sb.from('mpesa_days').upsert(rec,{onConflict:'date'}).select().single();if(error)throw error;const idx=days.findIndex(d=>d.date===todayStr());if(idx>=0)days[idx]=data;else days.unshift(data);}catch(e){days.unshift(rec);}
   floatBal=cf;cashBal=cc;todayDay=null;
-  // ⭐ Clear shared state for next day
   await saveSharedState();
   closeModal('closeDayModal');updateFloatBar();renderDayBook();
   toast(`Day closed ✅  Commission: ${KSH(comm)}`);
@@ -937,7 +920,7 @@ function renderSettings(){
   document.getElementById('setAgentNo').value=settings.agentNo||'';
   document.getElementById('setTillNo').value=settings.tillNo||'';
   document.getElementById('setFloatTarget').value=settings.floatTarget||50000;
-  document.getElementById('sqlBlock').textContent=`-- Run this SQL in Supabase → SQL Editor
+  document.getElementById('sqlBlock').textContent=`-- Run this SQL in Supabase -> SQL Editor
 
 create table if not exists mpesa_transactions (
   id bigint primary key,
@@ -962,7 +945,6 @@ create table if not exists mpesa_days (
   commission numeric default 0, txn_count int default 0
 );
 
--- ⭐ NEW: Shared state table — fixes opening float/cash sync
 create table if not exists mpesa_state (
   id text primary key,
   float_bal numeric default 0,
@@ -971,7 +953,6 @@ create table if not exists mpesa_state (
   updated_at timestamptz default now()
 );
 
--- Enable real-time for all tables
 alter publication supabase_realtime
   add table mpesa_transactions, mpesa_days, mpesa_state;`;
 }
@@ -995,7 +976,6 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'DELETE',schema:'public',table:'mpesa_transactions'},payload=>{txns=txns.filter(t=>t.id!=payload.old.id);updateFloatBar();renderDash();})
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_days'},payload=>{const idx=days.findIndex(d=>d.date==payload.new.date);if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);})
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_days'},payload=>{const idx=days.findIndex(d=>d.date==payload.new.date);if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);})
-    // ⭐ Listen for shared state changes — all devices update balances instantly
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_state'},payload=>{
       if(payload.new){
         floatBal=payload.new.float_bal||0;cashBal=payload.new.cash_bal||0;
@@ -1021,7 +1001,6 @@ function subscribeRealtime(){
 async function init(){
   loadLocalSettings();
   document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();
-  // ⭐ Load shared state FIRST so float/cash/opening are correct
   await loadSharedState();
   try{const{data,error}=await sb.from('mpesa_transactions').select('*').order('id',{ascending:false});if(error)throw error;txns=data||[];setOnline();}catch(e){setOffline();}
   await loadDays();
