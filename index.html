@@ -121,6 +121,28 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
 #toast.show{opacity:1;transform:translateY(0);}#toast.t-amber{background:var(--amber);color:#000;}#toast.t-red{background:var(--red);}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media(max-width:580px){.g2{grid-template-columns:1fr;}main{padding:12px;}nav{padding:6px 12px;}.txn-big-grid{grid-template-columns:1fr 1fr;}}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+@media(max-width:700px){.analytics-grid{grid-template-columns:1fr;}}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.chart-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;color:var(--green);font-weight:700;margin-bottom:2px;}
+.chart-subtitle{font-size:.68rem;color:var(--muted);margin-bottom:12px;letter-spacing:.5px;}
+.bar-chart-wrap{display:flex;align-items:flex-end;gap:4px;height:100px;padding:4px 0 0;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default;}
+.bar-col:hover .bar-fill{filter:brightness(1.3);}
+.bar-val{font-size:.55rem;color:var(--green);font-family:'Rajdhani',sans-serif;font-weight:700;min-height:10px;text-align:center;}
+.bar-fill{width:100%;border-radius:3px 3px 0 0;transition:height .5s cubic-bezier(.4,0,.2,1),filter .2s;min-height:2px;}
+.bar-lbl{font-size:.55rem;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;}
+.dvw-row{margin-bottom:12px;}
+.dvw-label{display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:4px;}
+.dvw-label-name{color:var(--muted);}.dvw-label-val{font-family:'Rajdhani',sans-serif;font-weight:700;}
+.dvw-track{background:var(--border);border-radius:4px;height:12px;overflow:hidden;}
+.dvw-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.best-day-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+.best-day-row:last-child{border:none;}
+.best-day-rank{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;min-width:22px;color:var(--muted);}
+.best-day-rank.gold{color:#f59e0b;}.best-day-rank.silver{color:#9ca3af;}.best-day-rank.bronze{color:#b45309;}
+.best-day-info{flex:1;}.best-day-date{font-size:.78rem;font-weight:600;color:var(--text);}.best-day-txns{font-size:.65rem;color:var(--muted);}
+.best-day-comm{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--green);}
 </style>
 </head>
 <body>
@@ -177,6 +199,40 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
       <div class="stitle">Recent Transactions</div>
       <div class="form-card" style="padding:0;overflow:hidden"><div id="dashRecent"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
     </div>
+  </div>
+
+  <!-- ── ANALYTICS CHARTS ── -->
+  <div class="stitle" style="margin-top:8px">📊 Visual Analytics</div>
+  <div class="analytics-grid">
+
+    <!-- Chart 1: Daily Commission Bar Chart -->
+    <div class="chart-card">
+      <div class="chart-title">💰 Daily Commission — Last 14 Days</div>
+      <div class="chart-subtitle" id="commChartSub">Loading...</div>
+      <div class="bar-chart-wrap" id="commBarChart"></div>
+    </div>
+
+    <!-- Chart 2: Transaction Volume Over Time -->
+    <div class="chart-card">
+      <div class="chart-title">📈 Transaction Volume — Last 14 Days</div>
+      <div class="chart-subtitle" id="volChartSub">Loading...</div>
+      <div class="bar-chart-wrap" id="volBarChart"></div>
+    </div>
+
+    <!-- Chart 3: Deposit vs Withdrawal -->
+    <div class="chart-card">
+      <div class="chart-title">⚖️ Deposits vs Withdrawals</div>
+      <div class="chart-subtitle" id="dvwSub">Today's breakdown</div>
+      <div id="dvwChart" style="padding:8px 0"></div>
+    </div>
+
+    <!-- Chart 4: Best Days -->
+    <div class="chart-card">
+      <div class="chart-title">🏆 Your Best Days</div>
+      <div class="chart-subtitle">Top 5 by commission earned</div>
+      <div id="bestDaysChart" style="padding:8px 0"></div>
+    </div>
+
   </div>
 </div>
 <!-- NEW TRANSACTION -->
@@ -456,6 +512,124 @@ function updateFloatBar(){
   chip.className='fchip'+(pct<20?' danger':pct<40?' warn':' good');
 }
 
+// ══════ ANALYTICS CHARTS ══════
+function getLast14Days(){
+  const days=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    days.push({date:ds,lbl:d.toLocaleDateString('en-KE',{day:'numeric',month:'short'})});
+  }
+  return days;
+}
+
+function renderBarChart(containerId, days14, valueFn, colorFn){
+  const vals=days14.map(d=>valueFn(d.date));
+  const max=Math.max(...vals,1);
+  document.getElementById(containerId).innerHTML=days14.map((d,i)=>{
+    const v=vals[i];
+    const h=Math.max(2,(v/max*88)).toFixed(1);
+    const col=colorFn?colorFn(v,max):'linear-gradient(180deg,var(--green3),var(--green))';
+    const isToday=d.date===todayStr();
+    return`<div class="bar-col" title="${d.lbl}: ${KSH(v)}">
+      <div class="bar-val">${v>0?v>=1000?(v/1000).toFixed(1)+'k':Math.round(v):''}</div>
+      <div class="bar-fill" style="height:${h}px;background:${col};${isToday?'box-shadow:0 0 6px rgba(0,200,100,.5)':''}"></div>
+      <div class="bar-lbl" style="${isToday?'color:var(--green);font-weight:700':''}">${d.lbl.split(' ')[0]}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCommBarChart(){
+  const days14=getLast14Days();
+  const vals=days14.map(d=>txns.filter(t=>t.date===d.date).reduce((s,t)=>s+(t.commission||0),0));
+  const total=vals.reduce((a,b)=>a+b,0);
+  const avg=total/14;
+  document.getElementById('commChartSub').textContent=`14-day total: ${KSH(total)} · Avg/day: ${KSH(avg)}`;
+  renderBarChart('commBarChart',days14,
+    date=>txns.filter(t=>t.date===date).reduce((s,t)=>s+(t.commission||0),0),
+    (v,max)=>{
+      const pct=v/max;
+      if(pct>0.8)return'linear-gradient(180deg,#007a3c,#00c853)';
+      if(pct>0.5)return'linear-gradient(180deg,#00a550,#00c853)';
+      return'linear-gradient(180deg,#1e3d28,#00a550)';
+    }
+  );
+}
+
+function renderVolBarChart(){
+  const days14=getLast14Days();
+  const vals=days14.map(d=>txns.filter(t=>t.date===d.date).reduce((s,t)=>s+(t.amount||0),0));
+  const total=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('volChartSub').textContent=`14-day total volume: ${KSH(total)}`;
+  renderBarChart('volBarChart',days14,
+    date=>txns.filter(t=>t.date===date).reduce((s,t)=>s+(t.amount||0),0),
+    ()=>'linear-gradient(180deg,#0369a1,#0ea5e9)'
+  );
+}
+
+function renderDvwChart(){
+  const today=todayTxns();
+  const allTime=txns;
+  const depToday=today.filter(t=>t.type==='deposit').reduce((s,t)=>s+(t.amount||0),0);
+  const wdwToday=today.filter(t=>t.type==='withdrawal').reduce((s,t)=>s+(t.amount||0),0);
+  const depAll=allTime.filter(t=>t.type==='deposit').reduce((s,t)=>s+(t.amount||0),0);
+  const wdwAll=allTime.filter(t=>t.type==='withdrawal').reduce((s,t)=>s+(t.amount||0),0);
+  const maxT=Math.max(depToday,wdwToday,1);
+  const maxA=Math.max(depAll,wdwAll,1);
+  document.getElementById('dvwSub').textContent=`Today & all-time comparison`;
+  document.getElementById('dvwChart').innerHTML=`
+    <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">TODAY</div>
+    <div class="dvw-row">
+      <div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depToday)}</span></div>
+      <div class="dvw-track"><div class="dvw-fill" style="width:${(depToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div>
+    </div>
+    <div class="dvw-row" style="margin-bottom:14px">
+      <div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwToday)}</span></div>
+      <div class="dvw-track"><div class="dvw-fill" style="width:${(wdwToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div>
+    </div>
+    <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">ALL TIME</div>
+    <div class="dvw-row">
+      <div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depAll)}</span></div>
+      <div class="dvw-track"><div class="dvw-fill" style="width:${(depAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div>
+    </div>
+    <div class="dvw-row">
+      <div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwAll)}</span></div>
+      <div class="dvw-track"><div class="dvw-fill" style="width:${(wdwAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div>
+    </div>`;
+}
+
+function renderBestDaysChart(){
+  // Group txns by date, sum commission
+  const byDate={};
+  txns.forEach(t=>{
+    if(!byDate[t.date])byDate[t.date]={commission:0,count:0,vol:0};
+    byDate[t.date].commission+=t.commission||0;
+    byDate[t.date].count++;
+    byDate[t.date].vol+=t.amount||0;
+  });
+  const sorted=Object.entries(byDate).sort((a,b)=>b[1].commission-a[1].commission).slice(0,5);
+  const medals=['🥇','🥈','🥉','4','5'];
+  const rankClass=['gold','silver','bronze','',''];
+  document.getElementById('bestDaysChart').innerHTML=sorted.length
+    ?sorted.map(([date,d],i)=>`
+      <div class="best-day-row">
+        <div class="best-day-rank ${rankClass[i]}">${medals[i]}</div>
+        <div class="best-day-info">
+          <div class="best-day-date">${new Date(date).toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div>
+          <div class="best-day-txns">${d.count} transactions · Vol: ${KSH(d.vol)}</div>
+        </div>
+        <div class="best-day-comm">${KSH(d.commission)}</div>
+      </div>`).join('')
+    :'<div class="empty"><div class="empty-icon">🏆</div>No data yet</div>';
+}
+
+function renderAnalytics(){
+  renderCommBarChart();
+  renderVolBarChart();
+  renderDvwChart();
+  renderBestDaysChart();
+}
+
 function renderDash(){
   updateFloatBar();
   const today=todayTxns();
@@ -491,6 +665,8 @@ function renderDash(){
       <div style="flex:1"><div style="font-size:.84rem;font-weight:600">${TXN_LABELS[t.type]||t.type}${t.customer_name?' · '+t.customer_name:''}</div><div style="font-size:.7rem;color:var(--muted)">${t.phone||'—'} · ${t.time}</div></div>
       <div style="text-align:right"><div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;color:${t.type==='withdrawal'?'var(--red)':'var(--green)'}">${KSH(t.amount)}</div><div style="font-size:.68rem;color:var(--muted)">Comm: ${KSH(t.commission||0)}</div></div>
     </div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div>No transactions yet</div>';
+  // Render analytics charts
+  renderAnalytics();
 }
 
 function renderTransact(){
