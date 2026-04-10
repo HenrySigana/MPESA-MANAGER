@@ -1,10 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- ===== PWA ===== -->
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,149 +21,46 @@
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
 
 /* ===================== LOGIN OVERLAY ===================== */
-#loginOverlay{
-  position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;
-  overflow:hidden;
-}
-#loginOverlay::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 60% 50% at 30% 20%, rgba(0,165,80,.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 75% 80%, rgba(0,200,83,.07) 0%, transparent 55%);
-  pointer-events:none;
-}
-/* animated grid lines */
-#loginOverlay::after{
-  content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(0,165,80,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,165,80,.04) 1px,transparent 1px);
-  background-size:40px 40px;
-  animation:gridScroll 20s linear infinite;
-  pointer-events:none;
-}
+#loginOverlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;}
+#loginOverlay::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 30% 20%, rgba(0,165,80,.12) 0%, transparent 60%),radial-gradient(ellipse 50% 60% at 75% 80%, rgba(0,200,83,.07) 0%, transparent 55%);pointer-events:none;}
+#loginOverlay::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,165,80,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,165,80,.04) 1px,transparent 1px);background-size:40px 40px;animation:gridScroll 20s linear infinite;pointer-events:none;}
 @keyframes gridScroll{from{background-position:0 0}to{background-position:40px 40px}}
-
-.login-box{
-  position:relative;z-index:1;
-  width:100%;max-width:380px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:36px 32px 32px;
-  box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(0,165,80,.08),inset 0 1px 0 rgba(255,255,255,.04);
-  animation:loginIn .5s cubic-bezier(.175,.885,.32,1.275) both;
-}
+.login-box{position:relative;z-index:1;width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px 32px 32px;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(0,165,80,.08),inset 0 1px 0 rgba(255,255,255,.04);animation:loginIn .5s cubic-bezier(.175,.885,.32,1.275) both;}
 @keyframes loginIn{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-
 .login-logo{text-align:center;margin-bottom:28px;}
-.login-logo-icon{
-  width:72px;height:72px;
-  background:linear-gradient(135deg,var(--green3),var(--green2));
-  border-radius:20px;
-  display:inline-grid;place-items:center;
-  font-size:2rem;
-  margin-bottom:14px;
-  box-shadow:0 8px 32px rgba(0,165,80,.35);
-  position:relative;
-}
-.login-logo-icon::after{
-  content:'';position:absolute;inset:-1px;
-  border-radius:21px;
-  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
-  pointer-events:none;
-}
+.login-logo-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--green3),var(--green2));border-radius:20px;display:inline-grid;place-items:center;font-size:2rem;margin-bottom:14px;box-shadow:0 8px 32px rgba(0,165,80,.35);position:relative;}
+.login-logo-icon::after{content:'';position:absolute;inset:-1px;border-radius:21px;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);pointer-events:none;}
 .login-title{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:1.5px;color:#fff;margin-bottom:4px;}
 .login-sub{font-size:.75rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-
 .pin-label{font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:14px;}
-
-/* PIN dot indicators */
 .pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:28px;}
-.pin-dot{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid var(--border);
-  background:transparent;
-  transition:all .2s cubic-bezier(.175,.885,.32,1.275);
-}
-.pin-dot.filled{
-  background:var(--green2);
-  border-color:var(--green2);
-  box-shadow:0 0 12px rgba(0,165,80,.5);
-  transform:scale(1.15);
-}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s cubic-bezier(.175,.885,.32,1.275);}
+.pin-dot.filled{background:var(--green2);border-color:var(--green2);box-shadow:0 0 12px rgba(0,165,80,.5);transform:scale(1.15);}
 .pin-dot.error{background:var(--red);border-color:var(--red);box-shadow:0 0 12px rgba(239,68,68,.5);}
-
-/* PIN keypad */
 .pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.pin-key{
-  aspect-ratio:1;border:1px solid var(--border);
-  background:var(--card);
-  border-radius:14px;
-  color:var(--text);
-  font-family:'Rajdhani',sans-serif;
-  font-size:1.4rem;font-weight:700;
-  cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1px;
-  transition:all .15s;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
+.pin-key{aspect-ratio:1;border:1px solid var(--border);background:var(--card);border-radius:14px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
 .pin-key:hover{background:rgba(0,165,80,.12);border-color:var(--green2);color:var(--green);}
 .pin-key:active{transform:scale(.93);background:rgba(0,165,80,.2);}
 .pin-key .sub{font-size:.45rem;letter-spacing:1.5px;color:var(--muted);font-weight:500;}
-.pin-key.zero{grid-column:2;}
-.pin-key.del{background:transparent;border-color:rgba(239,68,68,.25);color:var(--red);}
+.pin-key.zero{grid-column:2;}.pin-key.del{background:transparent;border-color:rgba(239,68,68,.25);color:var(--red);}
 .pin-key.del:hover{background:rgba(239,68,68,.1);border-color:var(--red);}
-
-.login-error{
-  text-align:center;margin-top:16px;
-  font-size:.82rem;color:var(--red);font-weight:600;
-  min-height:20px;
-  animation:shake .4s cubic-bezier(.36,.07,.19,.97) both;
-  opacity:0;transition:opacity .2s;
-}
+.login-error{text-align:center;margin-top:16px;font-size:.82rem;color:var(--red);font-weight:600;min-height:20px;animation:shake .4s cubic-bezier(.36,.07,.19,.97) both;opacity:0;transition:opacity .2s;}
 .login-error.show{opacity:1;}
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
-
 .login-box.shake-box{animation:boxShake .4s cubic-bezier(.36,.07,.19,.97);}
 @keyframes boxShake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
-
-/* attempt indicator */
 .attempt-bar{display:flex;gap:5px;justify-content:center;margin-top:14px;}
 .attempt-pip{width:8px;height:4px;border-radius:2px;background:var(--border);transition:background .3s;}
-.attempt-pip.used{background:var(--amber);}
-.attempt-pip.fail{background:var(--red);}
-
-/* lockout screen */
-#lockoutMsg{
-  display:none;text-align:center;margin-top:20px;
-  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
-  border-radius:12px;padding:14px 18px;
-}
+.attempt-pip.used{background:var(--amber);}.attempt-pip.fail{background:var(--red);}
+#lockoutMsg{display:none;text-align:center;margin-top:20px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px 18px;}
 #lockoutMsg .lock-icon{font-size:2rem;margin-bottom:6px;}
 #lockoutMsg p{font-size:.82rem;color:var(--red);margin-bottom:4px;}
 #lockoutMsg strong{font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--red);}
-
-/* logout button in header */
-#logoutBtn{
-  background:rgba(239,68,68,.1);
-  border:1px solid rgba(239,68,68,.3);
-  color:var(--red);
-  padding:4px 12px;border-radius:8px;
-  font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;
-  cursor:pointer;letter-spacing:.5px;
-  transition:all .2s;
-  display:none;
-}
+#logoutBtn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);padding:4px 12px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .2s;display:none;}
 #logoutBtn:hover{background:rgba(239,68,68,.2);}
-
-/* ===================== APP (hidden until logged in) ===================== */
 #appRoot{display:none;}
 
-/* ===================== REST OF YOUR ORIGINAL STYLES ===================== */
+/* ===================== APP STYLES ===================== */
 header{background:linear-gradient(135deg,#062010,#0a2e18,#0d3d1f);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--green2);position:sticky;top:0;z-index:100;}
 .logo{display:flex;align-items:center;gap:12px;}
 .logo-icon{width:42px;height:42px;background:var(--green2);border-radius:10px;display:grid;place-items:center;font-size:1.4rem;}
@@ -323,6 +218,45 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
 .exp-cat-icon{font-size:1.2rem;display:block;margin-bottom:2px;}
 .expense-form-section{display:none;}
 .expense-form-section.visible{display:block;}
+
+/* ===================== AI TAB STYLES ===================== */
+.ai-container{max-width:900px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px;}
+.ai-header{background:linear-gradient(135deg,#0d2137 0%,#1a3a5c 100%);border:1px solid var(--green);border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.ai-title{display:flex;align-items:center;gap:14px;}
+.ai-icon{font-size:2.2rem;}
+.ai-title h2{margin:0;font-size:1.3rem;color:var(--green);}
+.ai-title p{margin:2px 0 0;font-size:.8rem;color:var(--muted);}
+.ai-provider-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.ai-provider-row label{color:var(--muted);font-size:.85rem;}
+.ai-provider-row select,.ai-provider-row input{background:#0a1929;color:#e3f2fd;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;font-size:.85rem;width:auto;}
+.ai-provider-row input{flex:1;min-width:160px;}
+.btn-save-key{background:var(--green);color:#000;border:none;border-radius:8px;padding:6px 14px;cursor:pointer;font-weight:600;font-size:.85rem;font-family:'Rajdhani',sans-serif;}
+.ai-quick-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.ai-quick-actions button{background:#0a2540;color:#e3f2fd;border:1px solid #1e3a5f;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:.82rem;transition:all .2s;}
+.ai-quick-actions button:hover{background:var(--green);color:#000;border-color:var(--green);}
+.ai-insights-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.insight-card{background:#0a1929;border:1px solid #1e3a5f;border-radius:12px;padding:12px 16px;text-align:center;transition:border-color .3s;}
+.insight-label{color:var(--muted);font-size:.75rem;margin-bottom:6px;}
+.insight-value{color:var(--green);font-size:1.1rem;font-weight:700;font-family:'Rajdhani',sans-serif;}
+.ai-chat-window{background:#070f1a;border:1px solid #1e3a5f;border-radius:14px;padding:16px;height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+.ai-msg{display:flex;gap:10px;align-items:flex-start;}
+.ai-msg-user{flex-direction:row-reverse;}
+.ai-avatar{font-size:1.4rem;flex-shrink:0;}
+.ai-bubble{background:#0d2137;border:1px solid #1e3a5f;border-radius:12px;padding:10px 14px;color:#e3f2fd;font-size:.9rem;line-height:1.5;max-width:80%;white-space:pre-wrap;}
+.ai-msg-user .ai-bubble{background:var(--green);color:#000;border-color:#00e676;}
+.ai-typing{display:flex;gap:10px;align-items:center;padding:0 4px;}
+.typing-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;margin:0 2px;animation:typingBounce 1.2s infinite ease-in-out;}
+.typing-dot:nth-child(2){animation-delay:.2s;}.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingBounce{0%,80%,100%{transform:scale(1);opacity:.5;}40%{transform:scale(1.4);opacity:1;}}
+.ai-input-row{display:flex;gap:8px;align-items:flex-end;}
+#ai-user-input{flex:1;background:#0a1929;color:#e3f2fd;border:1px solid #1e3a5f;border-radius:12px;padding:10px 14px;font-size:.9rem;resize:none;font-family:inherit;}
+#ai-user-input:focus{outline:none;border-color:var(--green);}
+.btn-send-ai{background:var(--green);color:#000;border:none;border-radius:12px;width:46px;height:46px;font-size:1.2rem;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.btn-send-ai:hover{background:#00e676;}
+.btn-send-ai:disabled{background:#37474f;cursor:not-allowed;}
+.ai-footer-note{color:#37474f;font-size:.75rem;text-align:center;}
+.ai-clear-btn{background:transparent;border:1px solid #1e3a5f;color:var(--muted);border-radius:8px;padding:4px 10px;font-size:.75rem;cursor:pointer;}
+.ai-clear-btn:hover{border-color:var(--red);color:var(--red);}
 </style>
 </head>
 <body>
@@ -335,16 +269,13 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
       <div class="login-title">M-PESA AGENT</div>
       <div class="login-sub">Float &amp; Commission Manager</div>
     </div>
-
     <div class="pin-label">Enter your PIN to continue</div>
-
     <div class="pin-dots" id="pinDots">
       <div class="pin-dot" id="dot0"></div>
       <div class="pin-dot" id="dot1"></div>
       <div class="pin-dot" id="dot2"></div>
       <div class="pin-dot" id="dot3"></div>
     </div>
-
     <div class="pin-keypad" id="pinKeypad">
       <button class="pin-key" onclick="pinPress('1')">1<span class="sub"></span></button>
       <button class="pin-key" onclick="pinPress('2')">2<span class="sub">ABC</span></button>
@@ -358,15 +289,12 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
       <button class="pin-key zero" onclick="pinPress('0')">0</button>
       <button class="pin-key del" onclick="pinDelete()">⌫</button>
     </div>
-
     <div class="login-error" id="loginError"></div>
-
     <div class="attempt-bar" id="attemptBar">
       <div class="attempt-pip" id="pip0"></div>
       <div class="attempt-pip" id="pip1"></div>
       <div class="attempt-pip" id="pip2"></div>
     </div>
-
     <div id="lockoutMsg">
       <div class="lock-icon">🔒</div>
       <p>Too many failed attempts.</p>
@@ -408,6 +336,7 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
   <button onclick="switchTab('commission',this)">💰 Commission</button>
   <button onclick="switchTab('expenses',this)">💸 Expenses</button>
   <button onclick="switchTab('reports',this)">📈 Reports</button>
+  <button onclick="switchTab('ai',this)">🤖 AI Assistant</button>
   <button onclick="switchTab('settings',this)">⚙ Settings</button>
 </nav>
 <main>
@@ -681,6 +610,97 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
   </div>
 </div>
 
+<!-- ===================== AI ASSISTANT TAB ===================== -->
+<div class="tab" id="tab-ai">
+  <div class="ai-container">
+    <!-- Header & provider switcher -->
+    <div class="ai-header">
+      <div class="ai-title">
+        <div class="ai-icon">🤖</div>
+        <div>
+          <h2>AI Intelligence</h2>
+          <p>Powered by AI • M-Pesa Agent Insights for GB ICT Solutions</p>
+        </div>
+      </div>
+      <div class="ai-provider-row">
+        <label>AI Provider:</label>
+        <select id="ai-provider" onchange="onProviderChange()">
+          <option value="groq">⚡ Groq (Free)</option>
+          <option value="openai">🧠 OpenAI GPT-4</option>
+          <option value="gemini">✨ Gemini</option>
+        </select>
+        <input type="password" id="ai-api-key" placeholder="Paste API key…" style="flex:1;min-width:160px;" />
+        <button class="btn-save-key" onclick="saveApiKey()">💾 Save Key</button>
+        <button class="ai-clear-btn" onclick="clearAiChat()">🗑 Clear Chat</button>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="ai-quick-actions">
+      <button onclick="aiQuickAction('summary')">📊 Daily Summary</button>
+      <button onclick="aiQuickAction('anomaly')">🚨 Check Anomalies</button>
+      <button onclick="aiQuickAction('commission')">💰 Commission Forecast</button>
+      <button onclick="aiQuickAction('float')">💧 Float Analysis</button>
+      <button onclick="aiQuickAction('advice')">💡 Business Advice</button>
+      <button onclick="aiQuickAction('report')">📋 Full Report</button>
+    </div>
+
+    <!-- Live insight cards -->
+    <div class="ai-insights-row">
+      <div class="insight-card">
+        <div class="insight-label">📱 Float Status</div>
+        <div class="insight-value" id="insight-float-val">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">📊 Today's Transactions</div>
+        <div class="insight-value" id="insight-txn-val">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">💰 Est. Commission</div>
+        <div class="insight-value" id="insight-comm-val">—</div>
+      </div>
+      <div class="insight-card" id="insight-anomaly-card">
+        <div class="insight-label">🚨 Anomaly Alerts</div>
+        <div class="insight-value" id="insight-anomaly-val">—</div>
+      </div>
+    </div>
+
+    <!-- Chat window -->
+    <div class="ai-chat-window" id="ai-chat-window">
+      <div class="ai-msg ai-msg-assistant">
+        <div class="ai-avatar">🤖</div>
+        <div class="ai-bubble">
+          👋 <strong>Habari Henry!</strong> Mimi ni AI assistant wako wa M-Pesa.<br><br>
+          Naweza kukusaidia na:<br>
+          • Uchambuzi wa float na miamala<br>
+          • Kutambua miamala isiyo ya kawaida (anomalies)<br>
+          • Mahesabu ya commission na utabiri<br>
+          • Muhtasari kamili wa biashara yako<br><br>
+          Uliza swali lolote au bonyeza kitufe hapo juu! 🚀
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="ai-typing" id="ai-typing" style="display:none;">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-bubble" style="background:#0d2137;border:1px solid #1e3a5f;">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="ai-input-row">
+      <textarea id="ai-user-input" placeholder="Ask about your float, transactions, commissions… (Enter to send, Shift+Enter for new line)" rows="2"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage();}"></textarea>
+      <button class="btn-send-ai" onclick="sendAiMessage()" id="btn-send-ai">➤</button>
+    </div>
+    <div class="ai-footer-note">AI reads your live Supabase data as context • API keys stored locally in your browser only</div>
+  </div>
+</div>
+
 <!-- SETTINGS -->
 <div class="tab" id="tab-settings">
   <div class="stitle">Agent Settings</div>
@@ -756,7 +776,6 @@ td{padding:10px 13px;border-top:1px solid var(--border);font-size:.84rem;}tr:hov
 const CORRECT_PIN = '7526';
 const MAX_ATTEMPTS = 3;
 const LOCKOUT_SECONDS = 60;
-
 let pinBuffer = '';
 let failedAttempts = 0;
 let isLockedOut = false;
@@ -767,17 +786,13 @@ function pinPress(digit) {
   if (pinBuffer.length >= 4) return;
   pinBuffer += digit;
   updateDots();
-  if (pinBuffer.length === 4) {
-    setTimeout(checkPin, 120);
-  }
+  if (pinBuffer.length === 4) setTimeout(checkPin, 120);
 }
-
 function pinDelete() {
   if (isLockedOut) return;
   pinBuffer = pinBuffer.slice(0, -1);
   updateDots();
 }
-
 function updateDots() {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById('dot' + i);
@@ -785,52 +800,35 @@ function updateDots() {
     dot.classList.remove('error');
   }
 }
-
 function checkPin() {
   if (pinBuffer === CORRECT_PIN) {
-    // Success
     for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.add('filled');
     failedAttempts = 0;
     setTimeout(unlockApp, 300);
   } else {
-    // Failure
-    for (let i = 0; i < 4; i++) {
-      document.getElementById('dot' + i).classList.remove('filled');
-      document.getElementById('dot' + i).classList.add('error');
-    }
+    for (let i = 0; i < 4; i++) { document.getElementById('dot' + i).classList.remove('filled'); document.getElementById('dot' + i).classList.add('error'); }
     failedAttempts++;
     document.getElementById('pip' + (failedAttempts - 1)).classList.add('fail');
-
     const box = document.getElementById('loginBox');
     box.classList.add('shake-box');
     setTimeout(() => box.classList.remove('shake-box'), 400);
-
     const errEl = document.getElementById('loginError');
     const remaining = MAX_ATTEMPTS - failedAttempts;
-    if (remaining > 0) {
-      errEl.textContent = `Wrong PIN. ${remaining} attempt${remaining > 1 ? 's' : ''} remaining.`;
-    } else {
-      errEl.textContent = 'Too many attempts. Please wait.';
-    }
+    errEl.textContent = remaining > 0 ? `Wrong PIN. ${remaining} attempt${remaining > 1 ? 's' : ''} remaining.` : 'Too many attempts. Please wait.';
     errEl.classList.add('show');
-
     setTimeout(() => {
       for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error');
       pinBuffer = '';
-      if (failedAttempts >= MAX_ATTEMPTS) {
-        startLockout();
-      }
+      if (failedAttempts >= MAX_ATTEMPTS) startLockout();
     }, 600);
   }
 }
-
 function startLockout() {
   isLockedOut = true;
   document.getElementById('pinKeypad').style.opacity = '0.3';
   document.getElementById('pinKeypad').style.pointerEvents = 'none';
   document.getElementById('lockoutMsg').style.display = 'block';
   document.getElementById('loginError').classList.remove('show');
-
   let seconds = LOCKOUT_SECONDS;
   document.getElementById('lockCountdown').textContent = seconds;
   lockoutTimer = setInterval(() => {
@@ -838,65 +836,44 @@ function startLockout() {
     document.getElementById('lockCountdown').textContent = seconds;
     if (seconds <= 0) {
       clearInterval(lockoutTimer);
-      isLockedOut = false;
-      failedAttempts = 0;
-      pinBuffer = '';
+      isLockedOut = false; failedAttempts = 0; pinBuffer = '';
       document.getElementById('pinKeypad').style.opacity = '1';
       document.getElementById('pinKeypad').style.pointerEvents = '';
       document.getElementById('lockoutMsg').style.display = 'none';
       updateDots();
-      // Reset attempt pips
-      for (let i = 0; i < 3; i++) {
-        document.getElementById('pip' + i).className = 'attempt-pip';
-      }
+      for (let i = 0; i < 3; i++) document.getElementById('pip' + i).className = 'attempt-pip';
     }
   }, 1000);
 }
-
 function unlockApp() {
   sessionStorage.setItem('mpesa_unlocked', '1');
   const overlay = document.getElementById('loginOverlay');
   overlay.style.transition = 'opacity .4s ease, transform .4s ease';
-  overlay.style.opacity = '0';
-  overlay.style.transform = 'scale(1.05)';
+  overlay.style.opacity = '0'; overlay.style.transform = 'scale(1.05)';
   setTimeout(() => {
     overlay.style.display = 'none';
     document.getElementById('appRoot').style.display = 'block';
     document.getElementById('logoutBtn').style.display = 'inline-flex';
-    init(); // Start the app
+    init();
   }, 400);
 }
-
 function doLogout() {
   sessionStorage.removeItem('mpesa_unlocked');
-  pinBuffer = '';
-  failedAttempts = 0;
-  isLockedOut = false;
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('dot' + i);
-    dot.classList.remove('filled', 'error');
-  }
-  for (let i = 0; i < 3; i++) {
-    document.getElementById('pip' + i).className = 'attempt-pip';
-  }
+  pinBuffer = ''; failedAttempts = 0; isLockedOut = false;
+  for (let i = 0; i < 4; i++) { const dot = document.getElementById('dot' + i); dot.classList.remove('filled', 'error'); }
+  for (let i = 0; i < 3; i++) document.getElementById('pip' + i).className = 'attempt-pip';
   document.getElementById('loginError').classList.remove('show');
   document.getElementById('appRoot').style.display = 'none';
   document.getElementById('logoutBtn').style.display = 'none';
   const overlay = document.getElementById('loginOverlay');
-  overlay.style.display = 'flex';
-  overlay.style.opacity = '1';
-  overlay.style.transform = 'scale(1)';
+  overlay.style.display = 'flex'; overlay.style.opacity = '1'; overlay.style.transform = 'scale(1)';
   updateDots();
 }
-
-// Keyboard support for PIN
 document.addEventListener('keydown', e => {
   if (document.getElementById('loginOverlay').style.display === 'none') return;
   if (e.key >= '0' && e.key <= '9') pinPress(e.key);
   if (e.key === 'Backspace' || e.key === 'Delete') pinDelete();
 });
-
-// Check if already unlocked this session
 if (sessionStorage.getItem('mpesa_unlocked') === '1') {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
@@ -938,16 +915,13 @@ const KSH=v=>`KSh ${Number(v||0).toLocaleString('en-KE',{minimumFractionDigits:2
 function todayTxns(){return txns.filter(t=>t.date===todayStr());}
 function todayExpenses(){return txns.filter(t=>t.type==='expense'&&t.date===todayStr());}
 function inRange(t,r){const d=new Date(t.date),now=new Date();if(r==='today')return t.date===todayStr();if(r==='week')return now-d<7*86400000;if(r==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true;}
-
 function setOnline(){document.getElementById('syncDot').className='sync-dot';document.getElementById('syncStatus').textContent='Live • Synced';}
 function setOffline(){document.getElementById('syncDot').className='sync-dot off';document.getElementById('syncStatus').textContent='Offline';}
-
 function toast(msg,type='green'){
   const t=document.getElementById('toast');t.textContent=msg;t.className='';
   if(type==='amber')t.classList.add('t-amber');else if(type==='red')t.classList.add('t-red');else if(type==='purple')t.classList.add('t-purple');
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
 }
-
 function tick(){
   const n=new Date();
   document.getElementById('hDate').textContent=n.toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
@@ -962,7 +936,6 @@ function loadLocalSettings(){
     const nl=localStorage.getItem('mpesa_daily_notes');if(nl)dailyNotes=JSON.parse(nl);
   }catch(e){}
 }
-
 function saveNote(){
   const text=document.getElementById('dailyNoteInput').value.trim();
   dailyNotes[todayStr()]=text;
@@ -973,11 +946,9 @@ function saveNote(){
   toast('Note saved!','amber');
   updateDashNote();
 }
-
 async function saveNoteToDb(date, note){
   try{await sb.from('mpesa_days').upsert({id:Date.now(),date:date,daily_note:note},{onConflict:'date'});}catch(e){}
 }
-
 function clearNote(){
   if(!confirm('Clear today\'s note?'))return;
   document.getElementById('dailyNoteInput').value='';
@@ -988,34 +959,21 @@ function clearNote(){
   updateDashNote();
   toast('Note cleared','amber');
 }
-
 function updateDashNote(){
   const note=dailyNotes[todayStr()]||'';
   const el=document.getElementById('dashNoteDisplay');
-  if(el){
-    if(note.trim()){el.textContent=note;el.classList.remove('empty-note');}
-    else{el.textContent='No note for today. Go to Day Book to add one.';el.classList.add('empty-note');}
-  }
+  if(el){if(note.trim()){el.textContent=note;el.classList.remove('empty-note');}else{el.textContent='No note for today. Go to Day Book to add one.';el.classList.add('empty-note');}}
 }
-
 async function loadSharedState(){
   try{
     const{data,error}=await sb.from('mpesa_state').select('*').eq('id',STATE_KEY).single();
     if(error&&error.code!=='PGRST116')throw error;
-    if(data){
-      floatBal=data.float_bal||0;cashBal=data.cash_bal||0;
-      todayDay=data.today_day?(typeof data.today_day==='string'?JSON.parse(data.today_day):data.today_day):null;
-      if(todayDay&&todayDay.date!==todayStr())todayDay=null;
-    }
+    if(data){floatBal=data.float_bal||0;cashBal=data.cash_bal||0;todayDay=data.today_day?(typeof data.today_day==='string'?JSON.parse(data.today_day):data.today_day):null;if(todayDay&&todayDay.date!==todayStr())todayDay=null;}
   }catch(e){console.warn('Could not load shared state:',e.message);}
 }
-
 async function saveSharedState(){
-  try{
-    await sb.from('mpesa_state').upsert({id:STATE_KEY,float_bal:floatBal,cash_bal:cashBal,today_day:todayDay,updated_at:new Date().toISOString()},{onConflict:'id'});
-  }catch(e){
-    localStorage.setItem('mpesa_state_fallback',JSON.stringify({float_bal:floatBal,cash_bal:cashBal,today_day:todayDay}));
-  }
+  try{await sb.from('mpesa_state').upsert({id:STATE_KEY,float_bal:floatBal,cash_bal:cashBal,today_day:todayDay,updated_at:new Date().toISOString()},{onConflict:'id'});}
+  catch(e){localStorage.setItem('mpesa_state_fallback',JSON.stringify({float_bal:floatBal,cash_bal:cashBal,today_day:todayDay}));}
   localStorage.setItem('mpesa_topup_log',JSON.stringify(topupLog));
 }
 
@@ -1024,12 +982,11 @@ function switchTab(name,btn){
   document.querySelectorAll('nav button').forEach(e=>e.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
-  const map={dashboard:renderDash,transact:renderTransact,records:loadRecords,daybook:renderDayBook,float:renderFloat,commission:renderCommission,expenses:renderExpenses,reports:renderReports,settings:renderSettings};
+  const map={dashboard:renderDash,transact:renderTransact,records:loadRecords,daybook:renderDayBook,float:renderFloat,commission:renderCommission,expenses:renderExpenses,reports:renderReports,settings:renderSettings,ai:initAiTab};
   map[name]?.();
 }
 
 function getComm(amount,type){const band=COMM_BANDS.find(b=>amount>=b.min&&amount<=b.max);if(!band)return 0;if(type==='deposit')return band.dep;if(type==='withdrawal')return band.wdw;return 0;}
-
 function updateFloatBar(){
   const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
   const todayExp=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);
@@ -1044,13 +1001,11 @@ function updateFloatBar(){
   const chip=document.getElementById('fchipFloat');
   chip.className='fchip'+(pct<20?' danger':pct<40?' warn':' good');
 }
-
 function getLast14Days(){
   const ds=[];
   for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const s=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;ds.push({date:s,lbl:d.toLocaleDateString('en-KE',{day:'numeric',month:'short'})});}
   return ds;
 }
-
 function renderBarChart(containerId, days14, valueFn, colorFn){
   const vals=days14.map(d=>valueFn(d.date));
   const max=Math.max(...vals,1);
@@ -1058,14 +1013,9 @@ function renderBarChart(containerId, days14, valueFn, colorFn){
     const v=vals[i];const h=Math.max(2,(v/max*88)).toFixed(1);
     const col=colorFn?colorFn(v,max):'linear-gradient(180deg,var(--green3),var(--green))';
     const isToday=d.date===todayStr();
-    return`<div class="bar-col" title="${d.lbl}: ${KSH(v)}">
-      <div class="bar-val">${v>0?v>=1000?(v/1000).toFixed(1)+'k':Math.round(v):''}</div>
-      <div class="bar-fill" style="height:${h}px;background:${col};${isToday?'box-shadow:0 0 6px rgba(0,200,100,.5)':''}"></div>
-      <div class="bar-lbl" style="${isToday?'color:var(--green);font-weight:700':''}">${d.lbl.split(' ')[0]}</div>
-    </div>`;
+    return`<div class="bar-col" title="${d.lbl}: ${KSH(v)}"><div class="bar-val">${v>0?v>=1000?(v/1000).toFixed(1)+'k':Math.round(v):''}</div><div class="bar-fill" style="height:${h}px;background:${col};${isToday?'box-shadow:0 0 6px rgba(0,200,100,.5)':''}"></div><div class="bar-lbl" style="${isToday?'color:var(--green);font-weight:700':''}">${d.lbl.split(' ')[0]}</div></div>`;
   }).join('');
 }
-
 function renderCommBarChart(){
   const days14=getLast14Days();
   const vals=days14.map(d=>txns.filter(t=>t.date===d.date&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0));
@@ -1073,7 +1023,6 @@ function renderCommBarChart(){
   document.getElementById('commChartSub').textContent=`14-day total: ${KSH(total)} · Avg/day: ${KSH(avg)}`;
   renderBarChart('commBarChart',days14,date=>txns.filter(t=>t.date===date&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0),(v,max)=>{const p=v/max;return p>0.8?'linear-gradient(180deg,#007a3c,#00c853)':p>0.5?'linear-gradient(180deg,#00a550,#00c853)':'linear-gradient(180deg,#1e3d28,#00a550)';});
 }
-
 function renderVolBarChart(){
   const days14=getLast14Days();
   const vals=days14.map(d=>txns.filter(t=>t.date===d.date&&t.type!=='expense').reduce((s,t)=>s+(t.amount||0),0));
@@ -1081,7 +1030,6 @@ function renderVolBarChart(){
   document.getElementById('volChartSub').textContent=`14-day total volume: ${KSH(total)}`;
   renderBarChart('volBarChart',days14,date=>txns.filter(t=>t.date===date&&t.type!=='expense').reduce((s,t)=>s+(t.amount||0),0),()=>'linear-gradient(180deg,#0369a1,#0ea5e9)');
 }
-
 function renderDvwChart(){
   const today=todayTxns();const allTime=txns;
   const depToday=today.filter(t=>t.type==='deposit').reduce((s,t)=>s+(t.amount||0),0);
@@ -1090,26 +1038,16 @@ function renderDvwChart(){
   const wdwAll=allTime.filter(t=>t.type==='withdrawal').reduce((s,t)=>s+(t.amount||0),0);
   const maxT=Math.max(depToday,wdwToday,1);const maxA=Math.max(depAll,wdwAll,1);
   document.getElementById('dvwSub').textContent=`Today & all-time comparison`;
-  document.getElementById('dvwChart').innerHTML=`
-    <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">TODAY</div>
-    <div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depToday)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(depToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div></div>
-    <div class="dvw-row" style="margin-bottom:14px"><div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwToday)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(wdwToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div></div>
-    <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">ALL TIME</div>
-    <div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depAll)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(depAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div></div>
-    <div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwAll)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(wdwAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div></div>`;
+  document.getElementById('dvwChart').innerHTML=`<div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">TODAY</div><div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depToday)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(depToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div></div><div class="dvw-row" style="margin-bottom:14px"><div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwToday)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(wdwToday/maxT*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div></div><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">ALL TIME</div><div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📥 Deposits</span><span class="dvw-label-val" style="color:var(--green)">${KSH(depAll)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(depAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,var(--green3),var(--green))"></div></div></div><div class="dvw-row"><div class="dvw-label"><span class="dvw-label-name">📤 Withdrawals</span><span class="dvw-label-val" style="color:var(--red)">${KSH(wdwAll)}</span></div><div class="dvw-track"><div class="dvw-fill" style="width:${(wdwAll/maxA*100).toFixed(1)}%;background:linear-gradient(90deg,#b91c1c,var(--red))"></div></div></div>`;
 }
-
 function renderBestDaysChart(){
   const byDate={};
   txns.filter(t=>t.type!=='expense').forEach(t=>{if(!byDate[t.date])byDate[t.date]={commission:0,count:0,vol:0};byDate[t.date].commission+=t.commission||0;byDate[t.date].count++;byDate[t.date].vol+=t.amount||0;});
   const sorted=Object.entries(byDate).sort((a,b)=>b[1].commission-a[1].commission).slice(0,5);
   const medals=['🥇','🥈','🥉','4','5'];const rankClass=['gold','silver','bronze','',''];
-  document.getElementById('bestDaysChart').innerHTML=sorted.length?sorted.map(([date,d],i)=>`
-    <div class="best-day-row"><div class="best-day-rank ${rankClass[i]}">${medals[i]}</div><div class="best-day-info"><div class="best-day-date">${new Date(date).toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div><div class="best-day-txns">${d.count} txns · Vol: ${KSH(d.vol)}</div></div><div class="best-day-comm">${KSH(d.commission)}</div></div>`).join(''):'<div class="empty"><div class="empty-icon">🏆</div>No data yet</div>';
+  document.getElementById('bestDaysChart').innerHTML=sorted.length?sorted.map(([date,d],i)=>`<div class="best-day-row"><div class="best-day-rank ${rankClass[i]}">${medals[i]}</div><div class="best-day-info"><div class="best-day-date">${new Date(date).toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div><div class="best-day-txns">${d.count} txns · Vol: ${KSH(d.vol)}</div></div><div class="best-day-comm">${KSH(d.commission)}</div></div>`).join(''):'<div class="empty"><div class="empty-icon">🏆</div>No data yet</div>';
 }
-
 function renderAnalytics(){renderCommBarChart();renderVolBarChart();renderDvwChart();renderBestDaysChart();}
-
 function renderDash(){
   updateFloatBar();updateDashNote();
   const today=todayTxns().filter(t=>t.type!=='expense');
@@ -1118,19 +1056,11 @@ function renderDash(){
   const depVol=deps.reduce((s,t)=>s+(t.amount||0),0);const wdwVol=wdws.reduce((s,t)=>s+(t.amount||0),0);
   const todayExp=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);
   const target=settings.floatTarget||50000;const pct=Math.min(100,(floatBal/target)*100);
-  document.getElementById('dashStats').innerHTML=[
-    {l:'E-Float',v:KSH(floatBal),s:'Available',c:'g',a:''},{l:'Cash in Hand',v:KSH(cashBal),s:'Physical cash',c:'a',a:'amber'},
-    {l:'Today Commission',v:KSH(comm),s:'View only',c:'g',a:''},{l:'Today Expenses',v:KSH(todayExp),s:'From float/cash',c:'r',a:'red'},
-    {l:'Deposits Today',v:deps.length,s:KSH(depVol)+' vol',c:'b',a:'blue'},{l:'Total Assets',v:KSH(floatBal+cashBal),s:'Float + Cash',c:'g',a:''},
-  ].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
-  document.getElementById('dashFloat').textContent=KSH(floatBal);
-  document.getElementById('dashCash').textContent=KSH(cashBal);
-  document.getElementById('dashExpenses').textContent=KSH(todayExp);
-  document.getElementById('floatMeter').style.width=pct+'%';
-  document.getElementById('floatMeter').className='float-fill '+(pct<20?'low':pct<40?'warn':'good');
+  document.getElementById('dashStats').innerHTML=[{l:'E-Float',v:KSH(floatBal),s:'Available',c:'g',a:''},{l:'Cash in Hand',v:KSH(cashBal),s:'Physical cash',c:'a',a:'amber'},{l:'Today Commission',v:KSH(comm),s:'View only',c:'g',a:''},{l:'Today Expenses',v:KSH(todayExp),s:'From float/cash',c:'r',a:'red'},{l:'Deposits Today',v:deps.length,s:KSH(depVol)+' vol',c:'b',a:'blue'},{l:'Total Assets',v:KSH(floatBal+cashBal),s:'Float + Cash',c:'g',a:''}].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
+  document.getElementById('dashFloat').textContent=KSH(floatBal);document.getElementById('dashCash').textContent=KSH(cashBal);document.getElementById('dashExpenses').textContent=KSH(todayExp);
+  document.getElementById('floatMeter').style.width=pct+'%';document.getElementById('floatMeter').className='float-fill '+(pct<20?'low':pct<40?'warn':'good');
   document.getElementById('floatPct').textContent=pct.toFixed(0)+'% of '+KSH(target)+' target';
-  document.getElementById('dashFloatOut').textContent=KSH(depVol);
-  document.getElementById('dashFloatIn').textContent=KSH(wdwVol);
+  document.getElementById('dashFloatOut').textContent=KSH(depVol);document.getElementById('dashFloatIn').textContent=KSH(wdwVol);
   const warnings=[];
   if(floatBal<=0)warnings.push({c:'danger',m:'🚨 ZERO FLOAT — Cannot process deposits! Top up immediately.'});
   else if(pct<15)warnings.push({c:'danger',m:`⚠️ CRITICAL LOW FLOAT — Only ${KSH(floatBal)} left.`});
@@ -1138,24 +1068,15 @@ function renderDash(){
   if(cashBal>floatBal*3&&floatBal>0)warnings.push({c:'info',m:`💡 Cash heavy — Consider converting ${KSH(cashBal)} cash to float.`});
   document.getElementById('dashWarnings').innerHTML=warnings.map(w=>`<div class="warn-banner warn-${w.c}">${w.m}</div>`).join('');
   const recent=[...txns].slice(0,8);
-  document.getElementById('dashRecent').innerHTML=recent.length?recent.map(t=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
-      <div style="font-size:1.3rem">${TXN_ICONS[t.type]||'💳'}</div>
-      <div style="flex:1"><div style="font-size:.84rem;font-weight:600">${TXN_LABELS[t.type]||t.type}${t.type==='expense'&&t.expense_category?' · '+t.expense_category:t.customer_name?' · '+t.customer_name:''}</div><div style="font-size:.7rem;color:var(--muted)">${t.type==='expense'?(t.reference||''):(t.phone||'—')} · ${t.time}</div></div>
-      <div style="text-align:right"><div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;color:${t.type==='expense'?'var(--purple)':t.type==='withdrawal'?'var(--red)':'var(--green)'}">${t.type==='expense'?'-':''} ${KSH(t.amount)}</div><div style="font-size:.68rem;color:var(--muted)">${t.type!=='expense'?'Comm: '+KSH(t.commission||0):t.expense_deduct_from?'From '+t.expense_deduct_from:''}</div></div>
-    </div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div>No transactions yet</div>';
+  document.getElementById('dashRecent').innerHTML=recent.length?recent.map(t=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)"><div style="font-size:1.3rem">${TXN_ICONS[t.type]||'💳'}</div><div style="flex:1"><div style="font-size:.84rem;font-weight:600">${TXN_LABELS[t.type]||t.type}${t.type==='expense'&&t.expense_category?' · '+t.expense_category:t.customer_name?' · '+t.customer_name:''}</div><div style="font-size:.7rem;color:var(--muted)">${t.type==='expense'?(t.reference||''):(t.phone||'—')} · ${t.time}</div></div><div style="text-align:right"><div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;color:${t.type==='expense'?'var(--purple)':t.type==='withdrawal'?'var(--red)':'var(--green)'}">${t.type==='expense'?'-':''} ${KSH(t.amount)}</div><div style="font-size:.68rem;color:var(--muted)">${t.type!=='expense'?'Comm: '+KSH(t.commission||0):t.expense_deduct_from?'From '+t.expense_deduct_from:''}</div></div></div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div>No transactions yet</div>';
   renderAnalytics();
 }
-
 function renderTransact(){
   const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
   const todayExp=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);
-  document.getElementById('txnFloat').textContent=KSH(floatBal);
-  document.getElementById('txnCash').textContent=KSH(cashBal);
-  document.getElementById('txnComm').textContent=KSH(todayComm);
-  document.getElementById('txnExpenses').textContent=KSH(todayExp);
+  document.getElementById('txnFloat').textContent=KSH(floatBal);document.getElementById('txnCash').textContent=KSH(cashBal);
+  document.getElementById('txnComm').textContent=KSH(todayComm);document.getElementById('txnExpenses').textContent=KSH(todayExp);
 }
-
 function selectType(type){
   curType=type;
   document.querySelectorAll('.txn-big-btn,.txn-sm-btn').forEach(b=>b.classList.remove('active','active-red','active-purple','active-expense'));
@@ -1164,10 +1085,8 @@ function selectType(type){
   const titles={deposit:'📥 Deposit — Cash in, Float out',withdrawal:'📤 Withdrawal — Float in, Cash out',send:'➡️ Send Money (P2P)',airtime:'📱 Airtime / Data Bundle',paybill:'🏦 Paybill / Till Payment',topup:'🔄 Float Top-Up',expense:'💸 Record Expense'};
   document.getElementById('txnFormTitle').textContent=titles[type];
   const expFields=document.getElementById('expenseFields');
-  const phoneField=document.getElementById('phoneField');
-  const customerRow=document.getElementById('customerRow');
-  const commBox=document.getElementById('commBoxEl');
-  const submitBtn=document.getElementById('submitBtn');
+  const phoneField=document.getElementById('phoneField');const customerRow=document.getElementById('customerRow');
+  const commBox=document.getElementById('commBoxEl');const submitBtn=document.getElementById('submitBtn');
   if(type==='expense'){
     expFields.classList.add('visible');phoneField.style.display='none';customerRow.style.display='none';
     commBox.classList.add('expense-box');document.getElementById('commBoxLabel').textContent='💸 Expense Impact';
@@ -1181,22 +1100,18 @@ function selectType(type){
   }
   updatePreview();
 }
-
 function selectExpCat(el,cat){curExpCat=cat;document.querySelectorAll('.exp-cat-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setDeductFrom(from){expDeductFrom=from;document.getElementById('deductFloat').className='deduct-btn'+(from==='float'?' active-float':'');document.getElementById('deductCash').className='deduct-btn'+(from==='cash'?' active-cash':'');updatePreview();}
 function setQuickDeduct(from){quickExpDeduct=from;document.getElementById('quickDeductFloat').className='deduct-btn'+(from==='float'?' active-float':'');document.getElementById('quickDeductCash').className='deduct-btn'+(from==='cash'?' active-cash':'');updateQuickExp();}
-
 function updateQuickExp(){
   const amt=parseFloat(document.getElementById('quickExpAmt').value)||0;
-  const cat=document.getElementById('quickExpCat').value;
-  const from=quickExpDeduct;
+  const cat=document.getElementById('quickExpCat').value;const from=quickExpDeduct;
   const balAvail=from==='float'?floatBal:cashBal;
   const warn=document.getElementById('quickExpWarn');
   if(amt>0&&amt>balAvail){warn.textContent=`⚠ Not enough ${from==='float'?'float':'cash'} — only ${KSH(balAvail)} available`;warn.style.display='block';}else{warn.style.display='none';}
   if(amt>0){const icon=EXP_ICONS[cat]||'💸';document.getElementById('quickExpPreview').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:.8rem;font-weight:600;color:var(--purple)">${icon} ${cat} expense</div><div style="font-size:.7rem;color:var(--muted);margin-top:2px">Deduct from ${from==='float'?'📱 E-Float':'💵 Cash in Hand'}</div></div><div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;color:var(--red);font-weight:700">-${KSH(amt)}</div></div><div style="font-size:.72rem;color:var(--muted);margin-top:8px">${from==='float'?'📱':'💵'} ${from==='float'?'Float':'Cash'} after: <strong style="color:var(--text)">${KSH(balAvail-amt)}</strong></div>`;}
   else{document.getElementById('quickExpPreview').textContent='Enter amount to preview impact';}
 }
-
 function updatePreview(){
   const amt=parseFloat(document.getElementById('txnAmount').value)||0;
   if(curType==='expense'){
@@ -1222,7 +1137,6 @@ function updatePreview(){
   else if(amt>0&&curType==='withdrawal'&&amt>cashBal){warn.textContent=`⚠ Only ${KSH(cashBal)} cash available!`;warn.style.display='block';}
   else{warn.style.display='none';}
 }
-
 function getImpact(type,amt,comm){
   switch(type){
     case 'deposit':return[{cls:'cash-up',icon:'💵',label:'Cash In',val:'+'+KSH(amt)},{cls:'float-dn',icon:'📱',label:'Float Out',val:'-'+KSH(amt)},{cls:'neutral',icon:'💰',label:'Commission',val:KSH(comm)+' earned'}];
@@ -1234,48 +1148,26 @@ function getImpact(type,amt,comm){
     default:return[];
   }
 }
-
 async function submitTxn(){
   const amt=parseFloat(document.getElementById('txnAmount').value)||0;
   if(amt<=0){toast('Enter a valid amount','amber');return;}
   if(curType==='expense'){await submitExpenseFromForm(amt);return;}
-  const phone=document.getElementById('txnPhone').value.trim();
-  const customer=document.getElementById('txnCustomer').value.trim();
-  const ref=document.getElementById('txnRef').value.trim();
+  const phone=document.getElementById('txnPhone').value.trim();const customer=document.getElementById('txnCustomer').value.trim();const ref=document.getElementById('txnRef').value.trim();
   const comm=getComm(amt,curType);
-  switch(curType){
-    case 'deposit':floatBal-=amt;cashBal+=amt;break;
-    case 'withdrawal':floatBal+=amt;cashBal-=amt;break;
-    case 'send':floatBal-=amt;break;
-    case 'airtime':floatBal-=amt;break;
-    case 'paybill':floatBal-=amt;break;
-    case 'topup':floatBal+=amt;cashBal-=amt;break;
-  }
-  if(floatBal<0)toast('⚠ Float went negative! Top up needed.','amber');
-  if(cashBal<0)toast('⚠ Cash went negative!','amber');
+  switch(curType){case 'deposit':floatBal-=amt;cashBal+=amt;break;case 'withdrawal':floatBal+=amt;cashBal-=amt;break;case 'send':floatBal-=amt;break;case 'airtime':floatBal-=amt;break;case 'paybill':floatBal-=amt;break;case 'topup':floatBal+=amt;cashBal-=amt;break;}
+  if(floatBal<0)toast('⚠ Float went negative! Top up needed.','amber');if(cashBal<0)toast('⚠ Cash went negative!','amber');
   await saveSharedState();
   const rec={id:Date.now(),date:todayStr(),time:nowTime(),type:curType,amount:amt,phone:phone||null,customer_name:customer||null,reference:ref||null,commission:comm,float_after:floatBal,cash_after:cashBal,expense_category:null,expense_deduct_from:null};
-  try{
-    const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();
-    if(error)throw error;txns=[data,...txns];setOnline();
-    const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
-    toast(`${TXN_LABELS[curType]} ✓  Commission: ${KSH(comm)}  |  Today: ${KSH(todayComm)}`);
-    resetForm();updateFloatBar();renderTransact();renderDash();
-  }catch(e){txns=[rec,...txns];toast('Saved locally (sync: '+e.message+')','amber');setOffline();resetForm();updateFloatBar();renderTransact();}
+  try{const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();if(error)throw error;txns=[data,...txns];setOnline();const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);toast(`${TXN_LABELS[curType]} ✓  Commission: ${KSH(comm)}  |  Today: ${KSH(todayComm)}`);resetForm();updateFloatBar();renderTransact();renderDash();}
+  catch(e){txns=[rec,...txns];toast('Saved locally (sync: '+e.message+')','amber');setOffline();resetForm();updateFloatBar();renderTransact();}
 }
-
 async function submitExpenseFromForm(amt){const desc=document.getElementById('txnExpDesc').value.trim();await recordExpense(amt,curExpCat,expDeductFrom,desc);resetForm();}
-
 async function submitQuickExp(){
-  const amt=parseFloat(document.getElementById('quickExpAmt').value)||0;
-  if(amt<=0){toast('Enter amount','amber');return;}
+  const amt=parseFloat(document.getElementById('quickExpAmt').value)||0;if(amt<=0){toast('Enter amount','amber');return;}
   const cat=document.getElementById('quickExpCat').value;const desc=document.getElementById('quickExpDesc').value.trim();
   await recordExpense(amt,cat,quickExpDeduct,desc);
-  document.getElementById('quickExpAmt').value='';document.getElementById('quickExpDesc').value='';
-  document.getElementById('quickExpPreview').textContent='Enter amount to preview impact';
-  renderExpenses();
+  document.getElementById('quickExpAmt').value='';document.getElementById('quickExpDesc').value='';document.getElementById('quickExpPreview').textContent='Enter amount to preview impact';renderExpenses();
 }
-
 async function recordExpense(amt,cat,from,desc){
   const balAvail=from==='float'?floatBal:cashBal;
   if(amt>balAvail){if(!confirm(`You only have ${KSH(balAvail)} ${from==='float'?'float':'cash'}. Record anyway?`))return;}
@@ -1286,7 +1178,6 @@ async function recordExpense(amt,cat,from,desc){
   try{const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();if(error)throw error;txns=[data,...txns];setOnline();toast(`💸 Expense recorded: ${KSH(amt)} — ${cat}`,'purple');updateFloatBar();renderDash();}
   catch(e){txns=[rec,...txns];setOffline();toast('💸 Expense saved locally','amber');updateFloatBar();renderDash();}
 }
-
 function resetForm(){
   ['txnAmount','txnPhone','txnCustomer','txnRef','txnExpDesc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('commVal').textContent='KSh 0';document.getElementById('commBand').textContent='Enter amount to calculate';
@@ -1296,7 +1187,6 @@ function resetForm(){
   curExpCat='General';expDeductFrom='float';
   document.getElementById('deductFloat').className='deduct-btn active-float';document.getElementById('deductCash').className='deduct-btn';
 }
-
 async function loadRecords(){
   document.getElementById('recTable').innerHTML='<tr><td colspan="10"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>';
   try{
@@ -1304,20 +1194,9 @@ async function loadRecords(){
     const df=document.getElementById('recFilterDate').value;const tf=document.getElementById('recFilterType').value;
     if(df)q=q.eq('date',df);if(tf)q=q.eq('type',tf);
     const{data,error}=await q;if(error)throw error;
-    document.getElementById('recTable').innerHTML=data.length?data.map(t=>`<tr>
-      <td>${t.date}</td><td style="font-size:.75rem;color:var(--muted)">${t.time}</td>
-      <td><span class="badge badge-${t.type==='deposit'?'green':t.type==='withdrawal'?'red':t.type==='topup'?'blue':t.type==='expense'?'purple':'amber'}">${TXN_ICONS[t.type]} ${TXN_LABELS[t.type]}</span>${t.type==='expense'&&t.expense_category?`<br><span style="font-size:.68rem;color:var(--purple)">${EXP_ICONS[t.expense_category]||''} ${t.expense_category}</span>`:''}</td>
-      <td>${t.type==='expense'?(t.reference||t.customer_name||'—'):t.customer_name||'—'}</td>
-      <td style="font-size:.78rem;color:var(--muted)">${t.phone||'—'}</td>
-      <td style="font-family:'Rajdhani',sans-serif;font-weight:700;color:${t.type==='expense'?'var(--purple)':'inherit'}">${t.type==='expense'?'-':''}${KSH(t.amount)}</td>
-      <td style="color:var(--green);font-family:'Rajdhani',sans-serif">${t.type==='expense'?'—':KSH(t.commission||0)}</td>
-      <td style="font-size:.75rem;color:var(--muted)">${t.reference||'—'}</td>
-      <td style="font-size:.78rem">${getFloatEffect(t)}</td>
-      <td><button class="btn btn-red btn-xs" onclick="deleteTxn(${t.id})">🗑</button></td>
-    </tr>`).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">📋</div>No records found</div></td></tr>';
+    document.getElementById('recTable').innerHTML=data.length?data.map(t=>`<tr><td>${t.date}</td><td style="font-size:.75rem;color:var(--muted)">${t.time}</td><td><span class="badge badge-${t.type==='deposit'?'green':t.type==='withdrawal'?'red':t.type==='topup'?'blue':t.type==='expense'?'purple':'amber'}">${TXN_ICONS[t.type]} ${TXN_LABELS[t.type]}</span>${t.type==='expense'&&t.expense_category?`<br><span style="font-size:.68rem;color:var(--purple)">${EXP_ICONS[t.expense_category]||''} ${t.expense_category}</span>`:''}</td><td>${t.type==='expense'?(t.reference||t.customer_name||'—'):t.customer_name||'—'}</td><td style="font-size:.78rem;color:var(--muted)">${t.phone||'—'}</td><td style="font-family:'Rajdhani',sans-serif;font-weight:700;color:${t.type==='expense'?'var(--purple)':'inherit'}">${t.type==='expense'?'-':''}${KSH(t.amount)}</td><td style="color:var(--green);font-family:'Rajdhani',sans-serif">${t.type==='expense'?'—':KSH(t.commission||0)}</td><td style="font-size:.75rem;color:var(--muted)">${t.reference||'—'}</td><td style="font-size:.78rem">${getFloatEffect(t)}</td><td><button class="btn btn-red btn-xs" onclick="deleteTxn(${t.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">📋</div>No records found</div></td></tr>';
   }catch(e){document.getElementById('recTable').innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">⚠️</div>Could not load</div></td></tr>';setOffline();}
 }
-
 function getFloatEffect(t){
   if(t.type==='expense')return t.expense_deduct_from==='float'?`<span style="color:var(--purple)">Float -${KSH(t.amount)}</span>`:`<span style="color:var(--purple)">Cash -${KSH(t.amount)}</span>`;
   if(t.type==='deposit')return`<span style="color:var(--red)">−${KSH(t.amount)}</span>`;
@@ -1325,98 +1204,59 @@ function getFloatEffect(t){
   if(['send','airtime','paybill'].includes(t.type))return`<span style="color:var(--red)">−${KSH(t.amount)}</span>`;
   return'—';
 }
-
 async function deleteTxn(id){if(!confirm('Delete this transaction?'))return;try{await sb.from('mpesa_transactions').delete().eq('id',id);txns=txns.filter(t=>t.id!==id);loadRecords();renderDash();updateFloatBar();toast('Deleted','amber');}catch(e){toast('Error','red');}}
 function clearRecFilter(){document.getElementById('recFilterDate').value='';document.getElementById('recFilterType').value='';loadRecords();}
-
 async function loadDays(){try{const{data}=await sb.from('mpesa_days').select('*').order('id',{ascending:false});days=data||[];days.forEach(d=>{if(d.daily_note&&d.daily_note.trim()){dailyNotes[d.date]=dailyNotes[d.date]||d.daily_note;}});}catch(e){}}
-
 function renderDayBook(){
-  const isOpen=todayDay&&todayDay.date===todayStr();
-  const today=todayTxns().filter(t=>t.type!=='expense');
-  const todayExp=todayExpenses();
+  const isOpen=todayDay&&todayDay.date===todayStr();const today=todayTxns().filter(t=>t.type!=='expense');const todayExp=todayExpenses();
   document.getElementById('noteDate').textContent=todayStr();
-  document.getElementById('dayBtns').innerHTML=isOpen
-    ?`<button class="btn btn-red btn-sm" onclick="openModal('closeDayModal');prepClose()">🌇 Close Day</button><button class="btn btn-secondary btn-sm" onclick="window.print()">🖨 Print</button>`
-    :`<button class="btn btn-green" onclick="openModal('openDayModal')">🌅 Open Day</button>`;
-  document.getElementById('dayBanner').innerHTML=isOpen
-    ?`<div style="background:rgba(0,165,80,.1);border:1.5px solid var(--green2);border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-size:.88rem;font-weight:600;color:var(--green)">✅ Day is OPEN — ${todayStr()}</div><div style="font-size:.75rem;color:var(--muted)">Opened at ${todayDay.openTime} · ${today.length} transactions so far · ${todayExp.length} expenses</div></div>`
-    :`<div class="warn-banner warn-warn">⚠ Day not opened yet. Click <strong>"🌅 Open Day"</strong> to set opening balances and start tracking.</div>`;
-  document.getElementById('openDisplay').innerHTML=isOpen
-    ?`<div class="bal-row"><div><div class="bal-label">Opening E-Float</div><div class="bal-val" style="color:var(--green)">${KSH(todayDay.openFloat)}</div></div><span style="font-size:1.5rem">📱</span></div>
-       <div class="bal-row"><div><div class="bal-label">Opening Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayDay.openCash)}</div></div><span style="font-size:1.5rem">💵</span></div>
-       <div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(0,165,80,.08);border-radius:8px;font-size:.82rem;margin-top:4px"><span style="color:var(--muted)">Opening Total</span><span style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(todayDay.openFloat+todayDay.openCash)}</span></div>
-       <div style="font-size:.72rem;color:var(--muted);margin-top:8px">⏰ ${todayDay.openTime}${todayDay.openNote?' · '+todayDay.openNote:''}</div>`
-    :`<div class="empty"><div class="empty-icon">🌅</div>No day opened yet</div>`;
+  document.getElementById('dayBtns').innerHTML=isOpen?`<button class="btn btn-red btn-sm" onclick="openModal('closeDayModal');prepClose()">🌇 Close Day</button><button class="btn btn-secondary btn-sm" onclick="window.print()">🖨 Print</button>`:`<button class="btn btn-green" onclick="openModal('openDayModal')">🌅 Open Day</button>`;
+  document.getElementById('dayBanner').innerHTML=isOpen?`<div style="background:rgba(0,165,80,.1);border:1.5px solid var(--green2);border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-size:.88rem;font-weight:600;color:var(--green)">✅ Day is OPEN — ${todayStr()}</div><div style="font-size:.75rem;color:var(--muted)">Opened at ${todayDay.openTime} · ${today.length} transactions so far · ${todayExp.length} expenses</div></div>`:`<div class="warn-banner warn-warn">⚠ Day not opened yet. Click <strong>"🌅 Open Day"</strong> to set opening balances and start tracking.</div>`;
+  document.getElementById('openDisplay').innerHTML=isOpen?`<div class="bal-row"><div><div class="bal-label">Opening E-Float</div><div class="bal-val" style="color:var(--green)">${KSH(todayDay.openFloat)}</div></div><span style="font-size:1.5rem">📱</span></div><div class="bal-row"><div><div class="bal-label">Opening Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayDay.openCash)}</div></div><span style="font-size:1.5rem">💵</span></div><div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(0,165,80,.08);border-radius:8px;font-size:.82rem;margin-top:4px"><span style="color:var(--muted)">Opening Total</span><span style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(todayDay.openFloat+todayDay.openCash)}</span></div><div style="font-size:.72rem;color:var(--muted);margin-top:8px">⏰ ${todayDay.openTime}${todayDay.openNote?' · '+todayDay.openNote:''}</div>`:`<div class="empty"><div class="empty-icon">🌅</div>No day opened yet</div>`;
   const todayRecord=days.find(d=>d.date===todayStr());
-  document.getElementById('closeDisplay').innerHTML=(todayRecord&&todayRecord.close_float!=null)
-    ?`<div class="bal-row"><div><div class="bal-label">Closing E-Float</div><div class="bal-val" style="color:var(--red)">${KSH(todayRecord.close_float)}</div></div></div>
-       <div class="bal-row"><div><div class="bal-label">Closing Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayRecord.close_cash)}</div></div></div>`
-    :`<div class="empty"><div class="empty-icon">🌇</div>Day not closed yet</div>`;
-  const savedNote=dailyNotes[todayStr()]||'';
-  document.getElementById('dailyNoteInput').value=savedNote;
-  document.getElementById('noteSaveStatus').textContent=savedNote?'Last saved note loaded':'Type to begin writing...';
+  document.getElementById('closeDisplay').innerHTML=(todayRecord&&todayRecord.close_float!=null)?`<div class="bal-row"><div><div class="bal-label">Closing E-Float</div><div class="bal-val" style="color:var(--red)">${KSH(todayRecord.close_float)}</div></div></div><div class="bal-row"><div><div class="bal-label">Closing Cash</div><div class="bal-val" style="color:var(--amber)">${KSH(todayRecord.close_cash)}</div></div></div>`:`<div class="empty"><div class="empty-icon">🌇</div>Day not closed yet</div>`;
+  const savedNote=dailyNotes[todayStr()]||'';document.getElementById('dailyNoteInput').value=savedNote;document.getElementById('noteSaveStatus').textContent=savedNote?'Last saved note loaded':'Type to begin writing...';
   if(today.length>0||isOpen){
-    const deps=today.filter(t=>t.type==='deposit');const wdws=today.filter(t=>t.type==='withdrawal');
-    const comm=today.reduce((s,t)=>s+(t.commission||0),0);
-    const depVol=deps.reduce((s,t)=>s+(t.amount||0),0);const wdwVol=wdws.reduce((s,t)=>s+(t.amount||0),0);
-    const expVol=todayExp.reduce((s,t)=>s+(t.amount||0),0);
-    const openTotal=isOpen?todayDay.openFloat+todayDay.openCash:0;const curTotal=floatBal+cashBal;const netChange=isOpen?curTotal-openTotal:0;
+    const deps=today.filter(t=>t.type==='deposit');const wdws=today.filter(t=>t.type==='withdrawal');const comm=today.reduce((s,t)=>s+(t.commission||0),0);const depVol=deps.reduce((s,t)=>s+(t.amount||0),0);const wdwVol=wdws.reduce((s,t)=>s+(t.amount||0),0);const expVol=todayExp.reduce((s,t)=>s+(t.amount||0),0);const openTotal=isOpen?todayDay.openFloat+todayDay.openCash:0;const curTotal=floatBal+cashBal;const netChange=isOpen?curTotal-openTotal:0;
     document.getElementById('daySummary').innerHTML=`<div class="stats-row">${[{l:'Deposits',v:deps.length,s:KSH(depVol),c:'g',a:''},{l:'Withdrawals',v:wdws.length,s:KSH(wdwVol),c:'r',a:'red'},{l:'Expenses',v:todayExp.length,s:KSH(expVol),c:'p',a:'purple'},{l:'Commission',v:KSH(comm),s:'Tracked',c:'g',a:''},{l:'Net Change',v:KSH(netChange),s:netChange>=0?'Gained':'Lost',c:netChange>=0?'g':'r',a:netChange>=0?'':'red'}].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('')}</div><div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px"><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Balance Comparison (Float + Cash only)</div><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;text-align:center;align-items:center"><div><div style="font-size:.7rem;color:var(--muted)">Opening Total</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700">${KSH(openTotal)}</div></div><div style="font-size:1.5rem;color:var(--muted)">→</div><div><div style="font-size:.7rem;color:var(--muted)">Current Total</div><div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:${netChange>=0?'var(--green)':'var(--red)'}">${KSH(curTotal)}</div></div></div></div>`;
   }else{document.getElementById('daySummary').innerHTML='<div class="empty"><div class="empty-icon">📊</div>Open the day to start tracking</div>';}
   const past=days.filter(d=>d.date!==todayStr());
-  document.getElementById('dayHistTable').innerHTML=past.length?past.map(d=>{
-    const nc=(d.close_float+d.close_cash)-(d.open_float+d.open_cash);
-    const note=dailyNotes[d.date]||d.daily_note||'';
-    const expTotal=txns.filter(t=>t.type==='expense'&&t.date===d.date).reduce((s,t)=>s+(t.amount||0),0);
-    return`<tr><td style="font-weight:600">${d.date}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--green)">${KSH(d.open_float)}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${KSH(d.open_cash)}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--red)">${d.close_float!=null?KSH(d.close_float):'—'}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${d.close_cash!=null?KSH(d.close_cash):'—'}</td><td>${KSH(d.dep_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.dep_count||0} txns</span></td><td>${KSH(d.wdw_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.wdw_count||0} txns</span></td><td style="color:var(--purple);font-family:'Rajdhani',sans-serif">${KSH(expTotal)}</td><td style="color:var(--green);font-weight:700">${KSH(d.commission||0)}</td><td style="font-weight:700;color:${nc>=0?'var(--green)':'var(--red)'}">${nc>=0?'+':''}${KSH(nc)}</td><td style="font-size:.75rem;color:var(--muted);max-width:160px;white-space:pre-wrap">${note?note.substring(0,80)+(note.length>80?'...':''):'—'}</td></tr>`;
-  }).join(''):'<tr><td colspan="11"><div class="empty"><div class="empty-icon">📅</div>No past day records</div></td></tr>';
+  document.getElementById('dayHistTable').innerHTML=past.length?past.map(d=>{const nc=(d.close_float+d.close_cash)-(d.open_float+d.open_cash);const note=dailyNotes[d.date]||d.daily_note||'';const expTotal=txns.filter(t=>t.type==='expense'&&t.date===d.date).reduce((s,t)=>s+(t.amount||0),0);return`<tr><td style="font-weight:600">${d.date}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--green)">${KSH(d.open_float)}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${KSH(d.open_cash)}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--red)">${d.close_float!=null?KSH(d.close_float):'—'}</td><td style="font-family:'Rajdhani',sans-serif;color:var(--amber)">${d.close_cash!=null?KSH(d.close_cash):'—'}</td><td>${KSH(d.dep_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.dep_count||0} txns</span></td><td>${KSH(d.wdw_vol||0)}<br><span style="font-size:.7rem;color:var(--muted)">${d.wdw_count||0} txns</span></td><td style="color:var(--purple);font-family:'Rajdhani',sans-serif">${KSH(expTotal)}</td><td style="color:var(--green);font-weight:700">${KSH(d.commission||0)}</td><td style="font-weight:700;color:${nc>=0?'var(--green)':'var(--red)'}">${nc>=0?'+':''}${KSH(nc)}</td><td style="font-size:.75rem;color:var(--muted);max-width:160px;white-space:pre-wrap">${note?note.substring(0,80)+(note.length>80?'...':''):'—'}</td></tr>`;}).join(''):'<tr><td colspan="11"><div class="empty"><div class="empty-icon">📅</div>No past day records</div></td></tr>';
   const allNotes=Object.entries(dailyNotes).filter(([d,n])=>n&&n.trim()&&d!==todayStr()).sort((a,b)=>b[0].localeCompare(a[0]));
   document.getElementById('notesHistory').innerHTML=allNotes.length?allNotes.map(([date,note])=>`<div class="note-history-item"><div class="note-history-date">📅 ${new Date(date).toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="note-history-text">${note}</div></div>`).join(''):'<div class="empty"><div class="empty-icon">📝</div>No past notes yet</div>';
 }
-
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-
 async function confirmOpenDay(){
   const of2=parseFloat(document.getElementById('openFloat').value);const oc=parseFloat(document.getElementById('openCash').value);
   if(isNaN(of2)||isNaN(oc)){toast('Enter both values','amber');return;}
   todayDay={date:todayStr(),openFloat:of2,openCash:oc,openNote:document.getElementById('openNote').value,openTime:nowTime()};
-  floatBal=of2;cashBal=oc;
-  await saveSharedState();closeModal('openDayModal');
+  floatBal=of2;cashBal=oc;await saveSharedState();closeModal('openDayModal');
   ['openFloat','openCash','openNote'].forEach(id=>document.getElementById(id).value='');
   updateFloatBar();renderDayBook();toast(`Day opened! Float: ${KSH(of2)} | Cash: ${KSH(oc)}`);
 }
-
 function prepClose(){
   const today=todayTxns().filter(t=>t.type!=='expense');const comm=today.reduce((s,t)=>s+(t.commission||0),0);const expVol=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);
   document.getElementById('closeFloat').value=floatBal;document.getElementById('closeCash').value=cashBal;
   document.getElementById('closePreview').innerHTML=`<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;font-weight:600">Expected from tracking:</div><div style="display:flex;gap:16px;flex-wrap:wrap"><div><div style="font-size:.68rem;color:var(--muted)">Float</div><div style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(floatBal)}</div></div><div><div style="font-size:.68rem;color:var(--muted)">Cash</div><div style="font-family:'Rajdhani',sans-serif;color:var(--amber);font-weight:700">${KSH(cashBal)}</div></div><div><div style="font-size:.68rem;color:var(--muted)">Commission</div><div style="font-family:'Rajdhani',sans-serif;color:var(--green);font-weight:700">${KSH(comm)}</div></div><div><div style="font-size:.68rem;color:var(--muted)">Expenses</div><div style="font-family:'Rajdhani',sans-serif;color:var(--purple);font-weight:700">${KSH(expVol)}</div></div></div><div style="font-size:.7rem;color:var(--muted);margin-top:8px">💡 Count actual amounts and enter above.</div>`;
 }
-
 async function confirmCloseDay(){
   const cf=parseFloat(document.getElementById('closeFloat').value);const cc=parseFloat(document.getElementById('closeCash').value);
   if(isNaN(cf)||isNaN(cc)){toast('Enter both values','amber');return;}
-  const today=todayTxns().filter(t=>t.type!=='expense');
-  const deps=today.filter(t=>t.type==='deposit');const wdws=today.filter(t=>t.type==='withdrawal');
-  const comm=today.reduce((s,t)=>s+(t.commission||0),0);const expVol=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);
-  const dailyNote=dailyNotes[todayStr()]||'';
+  const today=todayTxns().filter(t=>t.type!=='expense');const deps=today.filter(t=>t.type==='deposit');const wdws=today.filter(t=>t.type==='withdrawal');
+  const comm=today.reduce((s,t)=>s+(t.commission||0),0);const expVol=todayExpenses().reduce((s,t)=>s+(t.amount||0),0);const dailyNote=dailyNotes[todayStr()]||'';
   const rec={id:Date.now(),date:todayStr(),open_float:todayDay?.openFloat||0,open_cash:todayDay?.openCash||0,open_time:todayDay?.openTime||'',open_note:todayDay?.openNote||'',close_float:cf,close_cash:cc,close_time:nowTime(),close_note:document.getElementById('closeNote').value,dep_count:deps.length,dep_vol:deps.reduce((s,t)=>s+(t.amount||0),0),wdw_count:wdws.length,wdw_vol:wdws.reduce((s,t)=>s+(t.amount||0),0),commission:comm,txn_count:today.length,daily_note:dailyNote,expense_vol:expVol};
   try{const{data,error}=await sb.from('mpesa_days').upsert(rec,{onConflict:'date'}).select().single();if(error)throw error;const idx=days.findIndex(d=>d.date===todayStr());if(idx>=0)days[idx]=data;else days.unshift(data);}catch(e){days.unshift(rec);}
-  floatBal=cf;cashBal=cc;todayDay=null;
-  await saveSharedState();closeModal('closeDayModal');updateFloatBar();renderDayBook();
+  floatBal=cf;cashBal=cc;todayDay=null;await saveSharedState();closeModal('closeDayModal');updateFloatBar();renderDayBook();
   toast(`Day closed ✅  Commission: ${KSH(comm)} | Expenses: ${KSH(expVol)}`);
 }
-
 function renderFloat(){
   const target=settings.floatTarget||50000;const pct=Math.min(100,(floatBal/target)*100);
-  document.getElementById('floatPageBal').textContent=KSH(floatBal);document.getElementById('cashPageBal').textContent=KSH(cashBal);
-  document.getElementById('totalPageBal').textContent=KSH(floatBal+cashBal);
+  document.getElementById('floatPageBal').textContent=KSH(floatBal);document.getElementById('cashPageBal').textContent=KSH(cashBal);document.getElementById('totalPageBal').textContent=KSH(floatBal+cashBal);
   document.getElementById('floatMeter2').style.width=pct+'%';document.getElementById('floatMeter2').className='float-fill '+(pct<20?'low':pct<40?'warn':'good');
   document.getElementById('floatPct2').textContent=pct.toFixed(0)+'% of '+KSH(target)+' target'+(pct<20?' ⚠ LOW':'');
   document.getElementById('topupHistory').innerHTML=topupLog.length?topupLog.slice(0,10).map(l=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:.84rem;font-weight:600;color:var(--green)">+${KSH(l.amount)}</div><div style="font-size:.7rem;color:var(--muted)">${l.method}${l.ref?' · '+l.ref:''}</div></div><div style="font-size:.7rem;color:var(--muted);text-align:right">${l.date}<br>${l.time}</div></div>`).join(''):'<div class="empty"><div class="empty-icon">🔄</div>No top-up history</div>';
 }
-
 async function doTopUp(){
   const amt=parseFloat(document.getElementById('topupAmt').value)||0;if(amt<=0){toast('Enter amount','amber');return;}
   const method=document.getElementById('topupMethod').value;const ref=document.getElementById('topupRef').value.trim();
@@ -1426,24 +1266,18 @@ async function doTopUp(){
   try{const{data,error}=await sb.from('mpesa_transactions').insert(rec).select().single();if(error)throw error;txns=[data,...txns];setOnline();}catch(e){txns=[rec,...txns];setOffline();}
   renderFloat();updateFloatBar();document.getElementById('topupAmt').value='';document.getElementById('topupRef').value='';toast(`Float topped up: +${KSH(amt)}`);
 }
-
 async function setBalances(){
   const f=parseFloat(document.getElementById('setFloatVal').value);const c=parseFloat(document.getElementById('setCashVal').value);
   if(!isNaN(f))floatBal=f;if(!isNaN(c))cashBal=c;await saveSharedState();renderFloat();updateFloatBar();toast('Balances updated!');
 }
-
 function renderCommission(){
-  const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
-  const monthComm=txns.filter(t=>inRange(t,'month')&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
-  const totalComm=txns.filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);
-  const nonExpTxns=txns.filter(t=>t.type!=='expense');
+  const todayComm=todayTxns().filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);const monthComm=txns.filter(t=>inRange(t,'month')&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);const totalComm=txns.filter(t=>t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);const nonExpTxns=txns.filter(t=>t.type!=='expense');
   document.getElementById('commStats').innerHTML=[{l:'Today',v:KSH(todayComm),s:'Earned today',c:'g',a:''},{l:'This Month',v:KSH(monthComm),s:'Month total',c:'b',a:'blue'},{l:'All Time',v:KSH(totalComm),s:'Total earned',c:'g',a:''},{l:'Avg per Txn',v:KSH(nonExpTxns.length?totalComm/nonExpTxns.length:0),s:'Average',c:'a',a:'amber'}].map(s=>`<div class="stat ${s.a}"><div class="stat-label">${s.l}</div><div class="stat-val ${s.c}">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
   document.getElementById('commBandTable').innerHTML=COMM_BANDS.map(b=>`<tr><td>${b.label}</td><td style="color:var(--green);font-family:'Rajdhani',sans-serif">${b.dep>0?'KSh '+b.dep:'Free'}</td><td style="color:var(--red);font-family:'Rajdhani',sans-serif">${b.wdw>0?'KSh '+b.wdw:'Free'}</td></tr>`).join('');
   const byType={};txns.filter(t=>t.type!=='expense').forEach(t=>{if(!byType[t.type])byType[t.type]={c:0,comm:0};byType[t.type].c++;byType[t.type].comm+=t.commission||0;});
   const maxC=Math.max(...Object.values(byType).map(v=>v.comm),1);
   document.getElementById('commByType').innerHTML=Object.entries(byType).sort((a,b)=>b[1].comm-a[1].comm).map(([type,d])=>`<div class="rep-bar"><div class="rep-bar-label">${TXN_ICONS[type]} ${TXN_LABELS[type]||type}</div><div class="rep-bar-track"><div class="rep-bar-fill" style="width:${(d.comm/maxC*100).toFixed(1)}%"></div></div><div class="rep-bar-val">${KSH(d.comm)}</div></div>`).join('')||'<div class="empty"><div class="empty-icon">💰</div>No data yet</div>';
 }
-
 function renderExpenses(){
   const allExp=txns.filter(t=>t.type==='expense');const todayExp=allExp.filter(t=>t.date===todayStr());const monthExp=allExp.filter(t=>inRange(t,'month'));
   const todayTotal=todayExp.reduce((s,t)=>s+(t.amount||0),0);const monthTotal=monthExp.reduce((s,t)=>s+(t.amount||0),0);const allTotal=allExp.reduce((s,t)=>s+(t.amount||0),0);
@@ -1456,7 +1290,6 @@ function renderExpenses(){
   document.getElementById('expChart').innerHTML=days7.map(d=>{const val=allExp.filter(t=>t.date===d.date).reduce((s,t)=>s+(t.amount||0),0);const h=Math.max(3,(val/maxD*95)).toFixed(1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:.58rem;color:var(--purple);font-family:'Rajdhani',sans-serif">${val?KSH(val).replace('KSh ',''):''}</div><div style="width:100%;background:linear-gradient(180deg,#7c3aed,var(--purple));border-radius:3px 3px 0 0;min-height:2px;height:${h}%"></div><div style="font-size:.62rem;color:var(--muted)">${d.lbl}</div></div>`;}).join('');
   document.getElementById('expTable').innerHTML=allExp.length?allExp.map(t=>`<tr><td>${t.date}</td><td style="font-size:.75rem;color:var(--muted)">${t.time}</td><td><span class="badge badge-purple">${EXP_ICONS[t.expense_category]||'💸'} ${t.expense_category||'General'}</span></td><td style="font-size:.82rem">${t.reference||t.customer_name||'—'}</td><td style="font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--red)">-${KSH(t.amount)}</td><td><span class="badge ${t.expense_deduct_from==='float'?'badge-blue':'badge-amber'}">${t.expense_deduct_from==='float'?'📱 Float':'💵 Cash'}</span></td><td><button class="btn btn-red btn-xs" onclick="deleteTxn(${t.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">💸</div>No expenses recorded</div></td></tr>';
 }
-
 function setRange(r){curRange=r;renderReports();}
 function renderReports(){
   const recs=txns.filter(t=>inRange(t,curRange)&&t.type!=='expense');const expenses=txns.filter(t=>inRange(t,curRange)&&t.type==='expense');
@@ -1469,36 +1302,27 @@ function renderReports(){
   const maxD=Math.max(...days7.map(d=>txns.filter(t=>t.date===d.date&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0)),1);
   document.getElementById('repChart').innerHTML=days7.map(d=>{const val=txns.filter(t=>t.date===d.date&&t.type!=='expense').reduce((s,t)=>s+(t.commission||0),0);const h=Math.max(3,(val/maxD*100)).toFixed(1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:.58rem;color:var(--green);font-family:'Rajdhani',sans-serif">${val?val.toFixed(0):''}</div><div style="width:100%;background:linear-gradient(180deg,var(--green3),var(--green));border-radius:3px 3px 0 0;min-height:2px;height:${h}%"></div><div style="font-size:.62rem;color:var(--muted)">${d.lbl}</div></div>`;}).join('');
 }
-
 function renderSettings(){
   document.getElementById('setAgentName').value=settings.agentName||'';document.getElementById('setAgentNo').value=settings.agentNo||'';
   document.getElementById('setTillNo').value=settings.tillNo||'';document.getElementById('setFloatTarget').value=settings.floatTarget||50000;
   document.getElementById('sqlBlock').textContent=`-- Run this SQL in Supabase -> SQL Editor\ncreate table if not exists mpesa_transactions (\n  id bigint primary key,\n  date text, time text, type text,\n  amount numeric default 0,\n  phone text, customer_name text, reference text,\n  commission numeric default 0,\n  float_after numeric default 0,\n  cash_after numeric default 0,\n  expense_category text,\n  expense_deduct_from text,\n  created_at timestamptz default now()\n);\n\nalter table mpesa_transactions\n  add column if not exists expense_category text,\n  add column if not exists expense_deduct_from text;\n\ncreate table if not exists mpesa_days (\n  id bigint primary key,\n  date text unique,\n  open_float numeric default 0, open_cash numeric default 0,\n  open_time text, open_note text,\n  close_float numeric, close_cash numeric,\n  close_time text, close_note text,\n  dep_count int default 0, dep_vol numeric default 0,\n  wdw_count int default 0, wdw_vol numeric default 0,\n  commission numeric default 0, txn_count int default 0,\n  daily_note text,\n  expense_vol numeric default 0\n);\n\ncreate table if not exists mpesa_state (\n  id text primary key,\n  float_bal numeric default 0,\n  cash_bal numeric default 0,\n  today_day jsonb,\n  updated_at timestamptz default now()\n);\n\nalter publication supabase_realtime\n  add table mpesa_transactions, mpesa_days, mpesa_state;`;
 }
-
 function saveSettings(){
   settings.agentName=document.getElementById('setAgentName').value||'My M-Pesa';settings.agentNo=document.getElementById('setAgentNo').value;
   settings.tillNo=document.getElementById('setTillNo').value;settings.floatTarget=parseFloat(document.getElementById('setFloatTarget').value)||50000;
   localStorage.setItem('mpesa_agent_settings',JSON.stringify(settings));
-  document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();
-  toast('Settings saved!');
+  document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();toast('Settings saved!');
 }
 function copySql(){navigator.clipboard.writeText(document.getElementById('sqlBlock').textContent).then(()=>toast('SQL copied!')).catch(()=>toast('Copy manually','amber'));}
-
 function subscribeRealtime(){
   sb.channel('mpesa-changes')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_transactions'},payload=>{
-      if(!txns.find(t=>t.id==payload.new.id)){txns=[payload.new,...txns];updateFloatBar();renderDash();toast(`🔔 ${TXN_LABELS[payload.new.type]||payload.new.type} synced — ${KSH(payload.new.amount)}`);}
-    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_transactions'},payload=>{if(!txns.find(t=>t.id==payload.new.id)){txns=[payload.new,...txns];updateFloatBar();renderDash();toast(`🔔 ${TXN_LABELS[payload.new.type]||payload.new.type} synced — ${KSH(payload.new.amount)}`)}})
     .on('postgres_changes',{event:'DELETE',schema:'public',table:'mpesa_transactions'},payload=>{txns=txns.filter(t=>t.id!=payload.old.id);updateFloatBar();renderDash();})
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'mpesa_days'},payload=>{const idx=days.findIndex(d=>d.date==payload.new.date);if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);})
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_days'},payload=>{const idx=days.findIndex(d=>d.date==payload.new.date);if(idx>=0)days[idx]=payload.new;else days.unshift(payload.new);})
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_state'},payload=>{
-      if(payload.new){floatBal=payload.new.float_bal||0;cashBal=payload.new.cash_bal||0;const td=payload.new.today_day;todayDay=td?(typeof td==='string'?JSON.parse(td):td):null;if(todayDay&&todayDay.date!==todayStr())todayDay=null;updateFloatBar();renderDash();toast('🔄 Balances updated by another device');}
-    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'mpesa_state'},payload=>{if(payload.new){floatBal=payload.new.float_bal||0;cashBal=payload.new.cash_bal||0;const td=payload.new.today_day;todayDay=td?(typeof td==='string'?JSON.parse(td):td):null;if(todayDay&&todayDay.date!==todayStr())todayDay=null;updateFloatBar();renderDash();toast('🔄 Balances updated by another device');}})
     .subscribe(status=>{if(status==='SUBSCRIBED')setOnline();else setOffline();});
 }
-
 async function init(){
   loadLocalSettings();
   document.getElementById('agentTitle').textContent=(settings.agentName||'M-PESA AGENT').toUpperCase();
@@ -1507,13 +1331,293 @@ async function init(){
   await loadDays();
   updateFloatBar();renderDash();selectType('deposit');subscribeRealtime();
 }
-
-// Only auto-init if already authenticated
 if(sessionStorage.getItem('mpesa_unlocked')==='1'){init();}
+
+// ===================== AI ASSISTANT =====================
+const AI_KEY_STORAGE = 'mpesa_ai_keys';
+const AI_CHAT_HISTORY_KEY = 'mpesa_ai_chat_history';
+const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GROQ_MODEL = 'llama3-70b-8192';
+
+let aiChatHistory = [];
+let aiIsLoading = false;
+
+function initAiTab() {
+  onProviderChange();
+  loadAiChatHistory();
+  refreshAiInsights();
+}
+
+function onProviderChange() {
+  const provider = document.getElementById('ai-provider').value;
+  const stored = JSON.parse(localStorage.getItem(AI_KEY_STORAGE) || '{}');
+  document.getElementById('ai-api-key').placeholder = stored[provider] ? '✅ Key saved — paste to update' : 'Paste API key…';
+}
+
+function saveApiKey() {
+  const provider = document.getElementById('ai-provider').value;
+  const key = document.getElementById('ai-api-key').value.trim();
+  if (!key) { alert('Please enter an API key.'); return; }
+  const stored = JSON.parse(localStorage.getItem(AI_KEY_STORAGE) || '{}');
+  stored[provider] = key;
+  localStorage.setItem(AI_KEY_STORAGE, JSON.stringify(stored));
+  document.getElementById('ai-api-key').value = '';
+  toast('API key saved! 🔑');
+  onProviderChange();
+}
+
+function getApiKey() {
+  const provider = document.getElementById('ai-provider').value;
+  const stored = JSON.parse(localStorage.getItem(AI_KEY_STORAGE) || '{}');
+  return stored[provider] || null;
+}
+
+function loadAiChatHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(AI_CHAT_HISTORY_KEY) || '[]');
+    if (saved.length > 0) {
+      aiChatHistory = saved;
+      const win = document.getElementById('ai-chat-window');
+      win.innerHTML = '';
+      aiChatHistory.forEach(m => appendChatBubble(m.role, m.content, false));
+      win.scrollTop = win.scrollHeight;
+    }
+  } catch(e) { aiChatHistory = []; }
+}
+
+function saveChatHistory() {
+  if (aiChatHistory.length > 40) aiChatHistory = aiChatHistory.slice(-40);
+  localStorage.setItem(AI_CHAT_HISTORY_KEY, JSON.stringify(aiChatHistory));
+}
+
+function clearAiChat() {
+  if (!confirm('Clear all chat history?')) return;
+  aiChatHistory = [];
+  localStorage.removeItem(AI_CHAT_HISTORY_KEY);
+  document.getElementById('ai-chat-window').innerHTML = `<div class="ai-msg ai-msg-assistant"><div class="ai-avatar">🤖</div><div class="ai-bubble">Chat cleared. How can I help you? 🚀</div></div>`;
+}
+
+function appendChatBubble(role, content, scroll = true) {
+  const win = document.getElementById('ai-chat-window');
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role === 'user' ? 'ai-msg-user' : 'ai-msg-assistant'}`;
+  div.innerHTML = `<div class="ai-avatar">${role === 'user' ? '👤' : '🤖'}</div><div class="ai-bubble">${escHtml(content)}</div>`;
+  win.appendChild(div);
+  if (scroll) win.scrollTop = win.scrollHeight;
+}
+
+function escHtml(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+async function refreshAiInsights() {
+  ['insight-float-val','insight-txn-val','insight-comm-val','insight-anomaly-val'].forEach(id => {
+    document.getElementById(id).textContent = '⏳';
+  });
+  await buildLiveContext();
+}
+
+async function buildLiveContext() {
+  try {
+    // Use already-loaded txns array (no extra fetch needed)
+    const today = todayStr();
+    const todayT = txns.filter(t => t.date === today && t.type !== 'expense');
+    const todayDeps = todayT.filter(t => t.type === 'deposit');
+    const todayWdws = todayT.filter(t => t.type === 'withdrawal');
+    const totalIn = todayDeps.reduce((s,t) => s + (t.amount||0), 0);
+    const totalOut = todayWdws.reduce((s,t) => s + (t.amount||0), 0);
+    const todayComm = todayT.reduce((s,t) => s + (t.commission||0), 0);
+    const todayExpTotal = todayExpenses().reduce((s,t) => s + (t.amount||0), 0);
+
+    // Estimate commission
+    document.getElementById('insight-float-val').textContent = KSH(floatBal);
+    document.getElementById('insight-txn-val').textContent = todayT.length;
+    document.getElementById('insight-comm-val').textContent = KSH(todayComm);
+
+    // Anomalies
+    const anomalies = detectAnomalies(txns.filter(t => t.date === today), floatBal);
+    const anomCard = document.getElementById('insight-anomaly-card');
+    document.getElementById('insight-anomaly-val').textContent = anomalies.length > 0 ? `⚠️ ${anomalies.length}` : '✅ None';
+    anomCard.style.borderColor = anomalies.length > 0 ? 'var(--red)' : '#1e3a5f';
+
+    // Build context string
+    const last7 = [];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;last7.push(ds);}
+    const daysSummary = last7.map(ds => {
+      const dt = txns.filter(t => t.date === ds && t.type !== 'expense');
+      const dc = dt.reduce((s,t) => s+(t.commission||0), 0);
+      const dv = dt.reduce((s,t) => s+(t.amount||0), 0);
+      const de = txns.filter(t => t.date === ds && t.type === 'expense').reduce((s,t) => s+(t.amount||0), 0);
+      return `  ${ds}: ${dt.length} txns, Vol=${KSH(dv)}, Comm=${KSH(dc)}, Exp=${KSH(de)}`;
+    }).join('\n');
+
+    const recentList = txns.slice(0,15).map(t =>
+      `  [${t.date} ${t.time}] ${t.type.toUpperCase()} | KSh ${t.amount} | comm=KSh ${t.commission||0} | ${t.phone||t.customer_name||''}`
+    ).join('\n');
+
+    return `=== GB ICT Solutions M-Pesa Agent — Live Data (${new Date().toLocaleString('en-KE')}) ===
+Agent: ${settings.agentName || 'Henry'} | Till: 4009152
+Float Target: ${KSH(settings.floatTarget||50000)}
+
+CURRENT BALANCES:
+  E-Float: ${KSH(floatBal)}
+  Cash in Hand: ${KSH(cashBal)}
+  Total Assets: ${KSH(floatBal+cashBal)}
+
+TODAY (${today}):
+  Transactions: ${todayT.length} (Deposits: ${todayDeps.length}, Withdrawals: ${todayWdws.length})
+  Deposit Volume: ${KSH(totalIn)}
+  Withdrawal Volume: ${KSH(totalOut)}
+  Commission Earned: ${KSH(todayComm)}
+  Expenses: ${KSH(todayExpTotal)}
+  Net (Comm - Exp): ${KSH(todayComm - todayExpTotal)}
+
+LAST 7 DAYS SUMMARY:
+${daysSummary}
+
+RECENT 15 TRANSACTIONS:
+${recentList}
+
+ANOMALIES DETECTED: ${anomalies.length > 0 ? anomalies.join(' | ') : 'None'}
+
+COMMISSION BANDS (Safaricom):
+  Deposits: KSh 6-12 per txn depending on amount
+  Withdrawals: KSh 6-67 per txn depending on amount`;
+  } catch(err) {
+    console.error('Context build error:', err);
+    return 'Live data context unavailable. Answer based on general M-Pesa agent knowledge.';
+  }
+}
+
+function detectAnomalies(todayTxnList, float) {
+  const alerts = [];
+  const target = settings.floatTarget || 50000;
+  const pct = float / target * 100;
+  if (float <= 0) alerts.push('ZERO FLOAT — cannot serve deposits');
+  else if (pct < 15) alerts.push(`Critical low float: ${KSH(float)} (${pct.toFixed(0)}% of target)`);
+  else if (pct < 30) alerts.push(`Low float warning: ${KSH(float)}`);
+  const large = todayTxnList.filter(t => (t.amount||0) > 50000 && t.type !== 'expense');
+  if (large.length) alerts.push(`${large.length} large transaction(s) over KSh 50,000`);
+  const phoneCounts = {};
+  todayTxnList.forEach(t => { if(t.phone) phoneCounts[t.phone] = (phoneCounts[t.phone]||0)+1; });
+  const repeats = Object.entries(phoneCounts).filter(([,c]) => c >= 5);
+  if (repeats.length) alerts.push(`Repeated phone: ${repeats[0][0]} (${repeats[0][1]} txns today)`);
+  return alerts;
+}
+
+async function aiQuickAction(type) {
+  const prompts = {
+    summary: 'Give me a clear summary of today\'s M-Pesa agent performance. Include float status, transaction count, commission earned, and top observations.',
+    anomaly: 'Analyze my transaction data and identify any anomalies, unusual patterns, or risks. List specific issues and recommended actions.',
+    commission: 'Based on my recent transaction history, calculate and forecast my commissions for today, this week, and this month. Show the breakdown by transaction type.',
+    float: 'Analyze my float balance and usage patterns. Is my current float adequate? When should I top up? What is the optimal float level for my business volume?',
+    advice: 'Based on my M-Pesa agent data, give me 3–5 practical business improvement tips to increase commissions and serve customers better.',
+    report: 'Generate a comprehensive M-Pesa agent performance report: float analysis, transaction trends, commission summary, expense breakdown, anomalies, and top recommendations.',
+  };
+  document.getElementById('ai-user-input').value = prompts[type];
+  await sendAiMessage();
+}
+
+async function sendAiMessage() {
+  if (aiIsLoading) return;
+  const input = document.getElementById('ai-user-input');
+  const userMsg = input.value.trim();
+  if (!userMsg) return;
+
+  const provider = document.getElementById('ai-provider').value;
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    toast('Please save your ' + provider.toUpperCase() + ' API key first!', 'amber');
+    return;
+  }
+
+  input.value = '';
+  aiIsLoading = true;
+  document.getElementById('btn-send-ai').disabled = true;
+
+  appendChatBubble('user', userMsg);
+  aiChatHistory.push({ role: 'user', content: userMsg });
+
+  const typing = document.getElementById('ai-typing');
+  typing.style.display = 'flex';
+  document.getElementById('ai-chat-window').scrollTop = 99999;
+
+  try {
+    const context = await buildLiveContext();
+    const systemPrompt = `You are an expert M-Pesa agent business assistant for Henry's GB ICT Solutions M-Pesa agency in Nairobi, Kenya (Till: 4009152).
+You have access to live business data below. Be specific with numbers, use KSh for currency.
+Give practical, direct advice relevant to the Kenyan M-Pesa agent business context.
+Keep responses clear and well-structured. You may use a friendly Swahili greeting but respond mainly in English.
+
+${context}`;
+
+    let reply = '';
+    if (provider === 'groq') reply = await callGroq(apiKey, systemPrompt);
+    else if (provider === 'openai') reply = await callOpenAI(apiKey, systemPrompt);
+    else if (provider === 'gemini') reply = await callGemini(apiKey, systemPrompt, userMsg);
+
+    typing.style.display = 'none';
+    appendChatBubble('assistant', reply);
+    aiChatHistory.push({ role: 'assistant', content: reply });
+    saveChatHistory();
+  } catch(err) {
+    typing.style.display = 'none';
+    appendChatBubble('assistant', `❌ Error: ${err.message}\n\nCheck your API key and try again.`);
+  }
+
+  aiIsLoading = false;
+  document.getElementById('btn-send-ai').disabled = false;
+}
+
+async function callGroq(apiKey, systemPrompt) {
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...aiChatHistory.slice(-12)
+  ];
+  const res = await fetch(GROQ_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: GROQ_MODEL, messages, max_tokens: 1024, temperature: 0.5 })
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `Groq ${res.status}`); }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || 'No response.';
+}
+
+async function callOpenAI(apiKey, systemPrompt) {
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...aiChatHistory.slice(-12)
+  ];
+  const res = await fetch(OPENAI_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: 'gpt-4o-mini', messages, max_tokens: 1024, temperature: 0.5 })
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `OpenAI ${res.status}`); }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || 'No response.';
+}
+
+async function callGemini(apiKey, systemPrompt, userMsg) {
+  const fullPrompt = `${systemPrompt}\n\nUser message: ${userMsg}`;
+  const res = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], generationConfig: { maxOutputTokens: 1024, temperature: 0.5 } })
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `Gemini ${res.status}`); }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+}
 </script>
 
 <script>
-// Register Service Worker for PWA/offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
